@@ -1,5 +1,5 @@
 #include "types.h"
-#include "parse.h"
+#include "symbol.h"
 
 void testParse(){
     String symbolString[] = {

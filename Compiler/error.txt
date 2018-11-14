@@ -1,0 +1,6 @@
+const a = 0;
+char b = 'a';
+char c = '!';
+"	;
+
+test ! skip;

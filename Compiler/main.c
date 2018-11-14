@@ -1,4 +1,4 @@
-#include "parse.h"
+#include "symbol.h"
 #include "types.h"
 
 extern void testParse();

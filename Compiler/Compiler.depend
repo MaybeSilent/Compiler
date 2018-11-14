@@ -1,6 +1,6 @@
 # depslib dependency file v1.0
-1542030181 source:e:\workfile\develop\compiler\compiler\main.c
-	"parse.h"
+1542179483 source:e:\workfile\develop\compiler\compiler\main.c
+	"symbol.h"
 	"types.h"
 
 1542034052 source:e:\workfile\develop\compiler\compiler\parse.c
@@ -15,7 +15,20 @@
 	<stdlib.h>
 	<ctype.h>
 
-1542034191 source:e:\workfile\develop\compiler\compiler\testparse.c
+1542179483 source:e:\workfile\develop\compiler\compiler\testparse.c
 	"types.h"
-	"parse.h"
+	"symbol.h"
+
+1542189934 source:e:\workfile\develop\compiler\compiler\error.c
+	"types.h"
+	"symbol.h"
+
+1542181899 e:\workfile\develop\compiler\compiler\symbol.h
+
+1542190076 source:e:\workfile\develop\compiler\compiler\symbol.c
+	"symbol.h"
+	"types.h"
+	"error.h"
+
+1542188500 e:\workfile\develop\compiler\compiler\error.h
 

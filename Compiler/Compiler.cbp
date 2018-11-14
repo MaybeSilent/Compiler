@@ -34,6 +34,10 @@
 		<Unit filename="Testparse.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="error.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="error.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
