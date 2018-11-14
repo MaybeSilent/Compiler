@@ -1,0 +1,21 @@
+# depslib dependency file v1.0
+1542030181 source:e:\workfile\develop\compiler\compiler\main.c
+	"parse.h"
+	"types.h"
+
+1542034052 source:e:\workfile\develop\compiler\compiler\parse.c
+	"parse.h"
+	"types.h"
+
+1542017485 e:\workfile\develop\compiler\compiler\parse.h
+
+1542033170 e:\workfile\develop\compiler\compiler\types.h
+	<string.h>
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+
+1542034191 source:e:\workfile\develop\compiler\compiler\testparse.c
+	"types.h"
+	"parse.h"
+
