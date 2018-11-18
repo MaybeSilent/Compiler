@@ -17,8 +17,7 @@ void setup();
 void nextch();
 void skip(char request);
 
-void nextch()
-{
+void nextch(){
     if(DEBUG)
         printf("进入nextch\n");
     ch = fgetc(instream);
@@ -41,13 +40,12 @@ void skip(char request){
     nextch();
 }
 
-int isAlpha()
-{
+int isAlpha(){
     return (ch >= 'a' && ch <= 'z')||(ch >= 'A' && ch <= 'Z')||ch == '_';
 }
 
-int isNum()
-{
+
+int isNum(){
     return ch >= '0' && ch <= '9';
 }
 
@@ -251,7 +249,7 @@ void setup()
     //char filename[128];
     //printf("请输入编译文件名:");
     //scanf("%s",filename);
-    instream = fopen("error.txt","r");
+    instream = fopen("E:\\workfile\\develop\\Compiler\\Compiler\\error.txt","r");
     if(instream == NULL)
     {
         printf("文件不存在");

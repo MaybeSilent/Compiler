@@ -3,4 +3,6 @@
 
 void error(int n);
 
+int getErrorNum();
+
 #endif // ERROR_H_INCLUDED

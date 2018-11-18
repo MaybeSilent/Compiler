@@ -1,7 +1,18 @@
 #include "types.h"
+#include "parse.h"
 #include "symbol.h"
+#include "util.h"
 
 void testParse(){
+    setup();
+    insymbol();
+    varDec();
+    //constDec();
+    printtabs();
+    printcodes();
+}
+
+void testSymbol(){
     String symbolString[] = {
         "CHARSY","CONSTSY","DOSY","ELSESY","FORSY","IFSY","INPUTSY","INTSY",
         "MAINSY","OUTPUTSY","RETURNSY","VOIDSY","WHILESY",
@@ -30,3 +41,5 @@ void testParse(){
         }
     }
 }
+
+

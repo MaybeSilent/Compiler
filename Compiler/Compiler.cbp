@@ -31,7 +31,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="Testparse.c">
+		<Unit filename="Test.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="error.c">
@@ -45,7 +45,16 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="parse.h" />
+		<Unit filename="symbol.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="symbol.h" />
+		<Unit filename="test.h" />
 		<Unit filename="types.h" />
+		<Unit filename="util.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="util.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

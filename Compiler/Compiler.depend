@@ -1,34 +1,56 @@
 # depslib dependency file v1.0
-1542179483 source:e:\workfile\develop\compiler\compiler\main.c
+1542443369 source:e:\workfile\develop\compiler\compiler\main.c
+	"test.h"
+	"parse.h"
+
+1542542006 source:e:\workfile\develop\compiler\compiler\parse.c
 	"symbol.h"
 	"types.h"
-
-1542034052 source:e:\workfile\develop\compiler\compiler\parse.c
 	"parse.h"
-	"types.h"
+	"error.h"
+	"util.h"
 
-1542017485 e:\workfile\develop\compiler\compiler\parse.h
+1542460232 e:\workfile\develop\compiler\compiler\parse.h
 
-1542033170 e:\workfile\develop\compiler\compiler\types.h
+1542548489 e:\workfile\develop\compiler\compiler\types.h
 	<string.h>
 	<stdio.h>
 	<stdlib.h>
 	<ctype.h>
 
-1542179483 source:e:\workfile\develop\compiler\compiler\testparse.c
+1542419923 source:e:\workfile\develop\compiler\compiler\testparse.c
+	"types.h"
+	"parse.h"
+	"symbol.h"
+
+1542550653 source:e:\workfile\develop\compiler\compiler\error.c
 	"types.h"
 	"symbol.h"
 
-1542189934 source:e:\workfile\develop\compiler\compiler\error.c
-	"types.h"
-	"symbol.h"
+1542421113 e:\workfile\develop\compiler\compiler\symbol.h
 
-1542181899 e:\workfile\develop\compiler\compiler\symbol.h
-
-1542190076 source:e:\workfile\develop\compiler\compiler\symbol.c
+1542526362 source:e:\workfile\develop\compiler\compiler\symbol.c
 	"symbol.h"
 	"types.h"
 	"error.h"
 
-1542188500 e:\workfile\develop\compiler\compiler\error.h
+1542266682 e:\workfile\develop\compiler\compiler\error.h
+
+1542419938 source:e:\workfile\develop\compiler\compiler\testsymbol.c
+	"types.h"
+	"symbol.h"
+
+1542542626 source:e:\workfile\develop\compiler\compiler\test.c
+	"types.h"
+	"parse.h"
+	"symbol.h"
+	"util.h"
+
+1542442852 e:\workfile\develop\compiler\compiler\test.h
+
+1542541957 e:\workfile\develop\compiler\compiler\util.h
+
+1542550260 source:e:\workfile\develop\compiler\compiler\util.c
+	"types.h"
+	"error.h"
 

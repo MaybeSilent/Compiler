@@ -1,7 +1,5 @@
-#include "symbol.h"
-#include "types.h"
-
-extern void testParse();
+#include "test.h"
+#include "parse.h"
 
 int main()
 {
