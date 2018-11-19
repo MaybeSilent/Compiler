@@ -11,4 +11,6 @@ void enterblock();
 
 int loc(String id);
 String numToReg(int n);
+String numToLabel(int n);
+void emitLabel(int codepos , int labelnum);
 #endif // UTIL_H_INCLUDED

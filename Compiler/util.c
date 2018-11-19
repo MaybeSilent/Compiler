@@ -5,7 +5,24 @@
 char numstring[32];
 char charstring[32];
 char tempreg[32];
+char labelreg[32];
 
+String intToString(int inum){
+    itoa(inum,numstring,10);
+    return numstring;
+}
+
+String charToString(char ichar){
+    charstring[0] = ichar;
+    charstring[1] = '\0';
+    return charstring;
+}
+
+String numToLabel(int n){
+    strcpy(labelreg,"label_");
+    strcat(labelreg,intToString(n));
+    return labelreg;
+}
 
 void enterblock(){
     blockCount ++;
@@ -24,7 +41,6 @@ int loc(String id){
     }
     error(12);
     return -1;
-
 }
 
 void entertab(String name, enum kindsy kind, enum typel type, int value){
@@ -50,6 +66,10 @@ void entertab(String name, enum kindsy kind, enum typel type, int value){
 
 }
 
+void emitLabel(int codepos , int labelnum){
+    strcpy(codes[codepos].result,numToLabel(labelnum));
+}
+
 void emit(enum ops op, String arg1, String arg2, String result){
     codes[codeCount].op = op;
     strcpy(codes[codeCount].arg1 , arg1);
@@ -58,18 +78,6 @@ void emit(enum ops op, String arg1, String arg2, String result){
     codeCount++;
 }
 
-String intToString(int inum){
-
-    itoa(inum,numstring,10);
-    return numstring;
-}
-
-String charToString(char ichar){
-
-    charstring[0] = ichar;
-    charstring[1] = '\0';
-    return charstring;
-}
 
 String numToReg(int n){
     tempreg[0] = '$';

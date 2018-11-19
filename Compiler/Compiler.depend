@@ -3,16 +3,16 @@
 	"test.h"
 	"parse.h"
 
-1542542006 source:e:\workfile\develop\compiler\compiler\parse.c
+1542628774 source:e:\workfile\develop\compiler\compiler\parse.c
 	"symbol.h"
 	"types.h"
 	"parse.h"
 	"error.h"
 	"util.h"
 
-1542460232 e:\workfile\develop\compiler\compiler\parse.h
+1542618214 e:\workfile\develop\compiler\compiler\parse.h
 
-1542548489 e:\workfile\develop\compiler\compiler\types.h
+1542634641 e:\workfile\develop\compiler\compiler\types.h
 	<string.h>
 	<stdio.h>
 	<stdlib.h>
@@ -23,7 +23,7 @@
 	"parse.h"
 	"symbol.h"
 
-1542550653 source:e:\workfile\develop\compiler\compiler\error.c
+1542634032 source:e:\workfile\develop\compiler\compiler\error.c
 	"types.h"
 	"symbol.h"
 
@@ -40,7 +40,7 @@
 	"types.h"
 	"symbol.h"
 
-1542542626 source:e:\workfile\develop\compiler\compiler\test.c
+1542615297 source:e:\workfile\develop\compiler\compiler\test.c
 	"types.h"
 	"parse.h"
 	"symbol.h"
@@ -48,9 +48,9 @@
 
 1542442852 e:\workfile\develop\compiler\compiler\test.h
 
-1542541957 e:\workfile\develop\compiler\compiler\util.h
+1542628788 e:\workfile\develop\compiler\compiler\util.h
 
-1542550260 source:e:\workfile\develop\compiler\compiler\util.c
+1542622712 source:e:\workfile\develop\compiler\compiler\util.c
 	"types.h"
 	"error.h"
 

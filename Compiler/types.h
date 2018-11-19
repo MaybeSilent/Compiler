@@ -13,7 +13,7 @@ typedef char* String;
 enum symbol{
     CHARSY,CONSTSY,DOSY,ELSESY,FORSY,IFSY,INPUTSY,INTSY,
     MAINSY,OUTPUTSY,RETURNSY,VOIDSY,WHILESY,
-    PLUS,SUB,MULT,DIV,LESS,LESSEQU,EQU,NOEQU,BECOMESY,MORE,MOREEQU,COMMA,SEMICOLON,
+    PLUS,SUB,MULT,DIV,LESS,LESSEQU,EQU,NOEQU,MORE,MOREEQU,BECOMESY,COMMA,SEMICOLON,
     LPARENT,RPARENT,LBRACKET,RBRACKET,LBRACE,RBRACE,
     IDENTSY,INTCON,CHARCON,STRINGCON
 };
@@ -62,7 +62,10 @@ btab blocktabs[4096];
 int blockCount;
 
 enum ops{
-    ConstOp,VarOp,ArrayOp,FunctionOp,ParmOp,PushParm
+    ConstOp,VarOp,ArrayOp,FunctionOp,ParmOp,PushParmOp,GetArrayOp,MultOp,DivOp,AddOp,SubOp,
+    BecomeOp,LessOp,LessequOp,EquOp,NoequOp,MoreOp,MoreequOp,
+    FalseOp,TrueOp,GotoOp,LabelOp,ScanfOp,PrintfOp,RetOp,
+    //LESS,LESSEQU,EQU,NOEQU,MORE,MOREEQU,17-22 ->  12-17 -> -5
 };
 struct MidCode {
     enum ops op;
