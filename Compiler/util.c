@@ -97,9 +97,20 @@ void printtabs(){
     }
 }
 
+/*
+enum ops{
+    ConstOp,VarOp,ArrayOp,FunctionOp,ParmOp,PushParmOp,GetArrayOp,MultOp,DivOp,AddOp,SubOp,
+    BecomeOp,LessOp,LessequOp,EquOp,NoequOp,MoreOp,MoreequOp,
+    FalseOp,TrueOp,GotoOp,LabelOp,ScanfOp,PrintfOp,RetOp,MainOp
+    //LESS,LESSEQU,EQU,NOEQU,MORE,MOREEQU,17-22 ->  12-17 -> -5
+};
+*/
+
 void printcodes(){
     printf("<<<<<<<<<<<midcodes>>>>>>>>>>>>\n");
-    String opstring[] = {"const","var","array","function"};
+    String opstring[] = {"const","var","array","function","param","push","getArray","*","/","+","-",
+                        "=","<","<=","==","!=",">",">=",
+                        "falsegoto","truegoto","goto","label","scanf","printf","ret","main"};
     printf("%15s %15s %15s %15s\n","opeartion","arg1","arg2","result");
     int i = 0 ;
     for( ; i <  codeCount ; i++){

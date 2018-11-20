@@ -11,6 +11,9 @@ void term();
 void statement();
 void ifstate();
 
-
+//内部函数声明
+void statement();
+void state();
+void comstate();
 
 #endif // PARSE_H_INCLUDED

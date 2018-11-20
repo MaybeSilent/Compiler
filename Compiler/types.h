@@ -64,7 +64,7 @@ int blockCount;
 enum ops{
     ConstOp,VarOp,ArrayOp,FunctionOp,ParmOp,PushParmOp,GetArrayOp,MultOp,DivOp,AddOp,SubOp,
     BecomeOp,LessOp,LessequOp,EquOp,NoequOp,MoreOp,MoreequOp,
-    FalseOp,TrueOp,GotoOp,LabelOp,ScanfOp,PrintfOp,RetOp,
+    FalseOp,TrueOp,GotoOp,LabelOp,ScanfOp,PrintfOp,RetOp,MainOp
     //LESS,LESSEQU,EQU,NOEQU,MORE,MOREEQU,17-22 ->  12-17 -> -5
 };
 struct MidCode {

@@ -11,6 +11,8 @@ enum typel expreType; //xpression 返回值类型，用于类型转换判断问题
 
 enum typel retType; //返回语句的返回值类型
 
+int retFlag;
+
 char printreg[32][1024];
 int countprint;
 
@@ -144,6 +146,108 @@ void paramList(){
     if(curSy != RPARENT) error(8);
 }
 
+void funcInsert(int intFlag){
+    if(intFlag == 1) entertab(id,Function,Int,blockCount+1);//首先将function插入符号表之中
+    else if(intFlag == 0) entertab(id,Function,Char,blockCount+1);
+    else if(intFlag == -1) entertab(id,Function,None,blockCount+1);
+    /////////////////////////////
+    enterblock();    //enterblock
+    /////////////////////////////
+    emit(FunctionOp,"0","0",id);
+    paramList();
+    insymbol();
+    if(curSy == LBRACE) {
+        int retFlag = 0;
+        comstate();               //复合语句
+        if(retFlag != 1 && (intFlag == 1 || intFlag == 0)) error(33);
+    }
+    //////////////////////////函数返回值检查
+}
+
+void program(){
+    insymbol();
+
+    while(curSy == CONSTSY){
+        constDec();
+        if(curSy != SEMICOLON) error(26);
+        insymbol();
+        while(!(curSy == INTSY || curSy == CHARSY || curSy == VOIDSY || curSy == CONSTSY)){
+            error(31);
+            insymbol();
+        }
+    }
+    while(curSy == INTSY || curSy == CHARSY){
+        int intFlag = (curSy == INTSY);
+        insymbol();
+        if(curSy == IDENTSY){
+            insymbol();
+            if(curSy == LPARENT){ // 函数声明
+                funcInsert(intFlag);
+                break;
+            } else {
+                varInsert(intFlag);
+                if(curSy != SEMICOLON) error(32);
+            }
+        } else error(32);
+
+        insymbol();
+        while(!(curSy == INTSY || curSy == CHARSY || curSy == VOIDSY)){
+            error(31);
+            insymbol();
+        }
+    }
+    while(curSy == INTSY || curSy == CHARSY || curSy == VOIDSY){
+        int intFlag = (curSy == INTSY);
+        if(curSy == VOIDSY) intFlag = -1;
+        insymbol();
+        if(curSy == IDENTSY){
+            insymbol();
+            if(curSy == LPARENT){ // 函数声明
+                funcInsert(intFlag);
+            } else error(32);
+        } else if(curSy == MAINSY){
+            emit(MainOp,"0","0","0");
+            enterblock();
+            insymbol();
+            if(curSy == LPARENT){
+                insymbol();
+                if(curSy == RPARENT){
+                    insymbol();
+                    if(curSy == LBRACE){
+                        comstate();
+                    } else error(34);
+                } else error(34);
+            } else error(34);
+        } else error(32);
+    }
+
+    insymbol();
+
+    while(!(curSy == INTSY || curSy == CHARSY || curSy == VOIDSY)){
+            error(31);
+            insymbol();
+    }
+
+}
+
+void comstate(){
+    insymbol();
+    while(curSy == CONSTSY){
+        constDec();
+        if(curSy != SEMICOLON) error(26);
+        insymbol();
+    }
+    while(curSy == INTSY || curSy == CHARSY){
+        varDec();
+        if(curSy != SEMICOLON) error(26);
+        insymbol();
+    }
+    while(curSy != RBRACE){
+        state();
+        insymbol();
+    }
+
+}
 
 void callparm(int pos){
     enum typel params[128];
@@ -158,21 +262,19 @@ void callparm(int pos){
     int i = 0;
     for(i = 0 ; i < n ; i++){
         insymbol();
-        if(curSy == IDENTSY){
-            int idpos = loc(id);
-            if(idpos == -1) continue ;
-            if(idtabs[idpos].type != params[i]) error(16);
-            emit(PushParmOp,"0","0",id);
-        } else if(curSy == INTCON){
+        expression();
+        emit(PushParmOp,"0","0",retexpre);
+        if(expreType == Int){
             if(params[i] != Int) error(16);
-            emit(PushParmOp,"0","0",intToString(inum));
-        } else if(curSy == CHARCON){
+        } else if(expreType == Char){
             if(params[i] != Char) error(16);
-            emit(PushParmOp,"0","0",charToString(ichar));
         } else {
             error(15);
             return ;
-        }//emit不用类型，函数参数都放在栈中或者寄存器之中
+        }
+        if(curSy != COMMA && i != n-1) error(27);
+        if(curSy != RPARENT && i == n -1) error(15);
+        //emit不用类型，函数参数都放在栈中或者寄存器之中
     }
 }
 
@@ -289,16 +391,6 @@ void expression(){
     }
 }
 
-void funcInsert(int intFlag){
-    paramList();
-    insymbol();
-    if(curSy == '{'){
-        //复合语句
-    }
-    //////////////////
-    //记得None返回值的赋值操作
-}
-
 
 void synanalysis(){
     codeCount = 0;
@@ -344,7 +436,6 @@ void judgestate(){
         emit((enum ops)(curSy-5),judgereg,retexpre,"0");
         insymbol();
         if(curSy != RPARENT) error(19);
-        else insymbol();
     } else error(19);
 }
 
@@ -381,21 +472,68 @@ void dowhilestate(){
     insymbol();
     if(curSy == WHILESY){
         insymbol();
+        if(curSy != LPARENT) error(20);
         judgestate();
         emit(TrueOp,"0","0",numToLabel(dowhilelabel));
     } else error(20);
 }
 
 void forstate(){
+    int beforepos, afterpos, addFlag, step;
     insymbol();
-    if(curSy == IDENTSY){
+    if(curSy == LPARENT){
         insymbol();
-        if(curSy == BECOMESY){
-            int pos = loc(id);
-            if(pos == -1) error(12);
+        if(curSy == IDENTSY){
             insymbol();
-            expression();
-        }
+            if(curSy == BECOMESY){
+                int pos = loc(id);
+                if(pos == -1) error(12);
+                insymbol();
+                expression();
+                emit(BecomeOp,retexpre,"0",idtabs[pos].name);
+                insymbol();
+                if(curSy == SEMICOLON){
+                    int forjudgeLabel = labelNum;
+                    emit(LabelOp,"0","0",numToLabel(labelNum++));
+                    judgestate();
+                    int falseforLabel = codeCount;
+                    emit(FalseOp,"0","0","0");
+                    if(curSy == SEMICOLON){
+                        insymbol();
+                        if(curSy == IDENTSY){
+                            beforepos = loc(id);
+                            if(beforepos == -1) error(12);
+                            insymbol();
+                            if(curSy == BECOMESY){
+                                insymbol();
+                                if(curSy == IDENTSY){
+                                    afterpos = loc(id);
+                                    if(afterpos == -1) error(12);
+                                    insymbol();
+                                    if(curSy == PLUS || curSy == SUB){
+                                        addFlag = (curSy == PLUS);
+                                        insymbol();
+                                        if(curSy == INTCON){
+                                            step = inum;
+                                            insymbol();
+                                            if(curSy == RPARENT){
+                                                statement();
+
+                                                if(addFlag) emit(AddOp,idtabs[afterpos].name,intToString(step),idtabs[beforepos].name);
+                                                else emit(SubOp,idtabs[afterpos].name,intToString(step),idtabs[beforepos].name);
+                                                emit(GotoOp,"0","0",numToLabel(forjudgeLabel));
+                                                genBackLabel(falseforLabel);
+                                            } else error(24);
+                                        }else error(24);
+                                    } else error(24);
+                                } else error(24);
+                            } else error(24);
+                        }
+                    } else error(24);
+
+                } else error(24);
+            }
+        } else error(24);
     } else error(24);
 }
 
@@ -445,12 +583,61 @@ void returnstate(){
         expression();
         retType = expreType;
         emit(RetOp,"0","0",retexpre);
+        if(curSy != RPARENT) error(29);
+        else insymbol();
     } else {
         emit(RetOp,"0","0","0");
     }
 }
 
-void statement(){
+void state(){
+    if(curSy == IFSY){
+        ifstate();
+    } else if(curSy == DOSY){
+        dowhilestate();
+    } else if(curSy == FORSY){
+        forstate();
+    } else if(curSy == LBRACE){
+        statement();
+        insymbol();
+        while(curSy != RBRACE){
+            state();
+            insymbol();
+        }
+    } else if(curSy == IDENTSY){
+        int pos = loc(id);
+        if(pos == -1) error(12);
+        if(idtabs[pos].kind == Var || idtabs[pos].kind == Array){
+            insymbol();
+            if(curSy != BECOMESY) error(25);
+            assignstate(pos);
+            if(curSy != SEMICOLON) error(26);
+        } else if(idtabs[pos].kind == Function) {
+            callparm(pos);
+            insymbol();
+            if(curSy != SEMICOLON) error(26);
+        } else error(25);
+    } else if(curSy == INPUTSY){
+        readstate();
+        if(curSy != SEMICOLON) error(26);
+    } else if(curSy == OUTPUTSY){
+        writestate();
+        if(curSy != SEMICOLON) error(26);
+    } else if(curSy == RETURNSY){
+        retFlag = 1;
+        returnstate();
+        if(curSy != SEMICOLON) error(26);
+    } else if(curSy == SEMICOLON){
+        //空语句
+    } else {
+        error(28);
+        //直接跳转到下一句
+        while(curSy != SEMICOLON) insymbol();
+    }
+}
 
+void statement(){
+    insymbol();
+    state();
 }
 
