@@ -1,0 +1,11 @@
+const int a = 100;
+const int b = 2;
+int c;
+void test(){
+   int a;
+   a = 0;
+   a = a + 1;
+}
+void main(){
+    
+}

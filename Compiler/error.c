@@ -28,5 +28,5 @@ String errMessage[] = {
 void error(int n){
     errorNum ++ ;
     printf(errMessage[n]);
-    printf("：出错位置:%d行%d字符处标识符\n",countLine+1,countChar-1);
+    printf("：出错位置:%d行%d字符处标识符\n",countLine+1,countChar);
 }

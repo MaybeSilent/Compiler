@@ -13,4 +13,6 @@ int loc(String id);
 String numToReg(int n);
 String numToLabel(int n);
 void emitLabel(int codepos , int labelnum);
+
+void program();
 #endif // UTIL_H_INCLUDED

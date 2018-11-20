@@ -37,7 +37,9 @@ int loc(String id){
         int i = blocktabs[display[j]].last;
         while(i != 0){
             if(strcmp(idtabs[i].name , id) == 0) return i;
+            i --;
         }
+        j --;
     }
     error(12);
     return -1;
@@ -88,7 +90,7 @@ String numToReg(int n){
 
 void printtabs(){
     String kindString[] = {"const","var","array","function"};
-    String typeString[] = {"int","char","array","none"};
+    String typeString[] = {"int","char","none"};
     printf("%15s %15s %15s %15s %15s\n","name","kind","type","value","link");
     int i = 1 ;
     for( ; i <=  tabCount ; i++){

@@ -35,6 +35,7 @@ void constDec(){
     if(DEBUG) printf("进入consDec\n");
 
     insymbol();
+
     if(curSy == INTSY || curSy == CHARSY){
         int intFlag = 0;
         if(curSy == INTSY) intFlag = 1;
@@ -147,12 +148,16 @@ void paramList(){
 }
 
 void funcInsert(int intFlag){
-    if(intFlag == 1) entertab(id,Function,Int,blockCount+1);//首先将function插入符号表之中
-    else if(intFlag == 0) entertab(id,Function,Char,blockCount+1);
-    else if(intFlag == -1) entertab(id,Function,None,blockCount+1);
     /////////////////////////////
     enterblock();    //enterblock
     /////////////////////////////
+    if(intFlag == 1) entertab(id,Function,Int,blockCount);//首先将function插入符号表之中
+    else if(intFlag == 0) entertab(id,Function,Char,blockCount);
+    else if(intFlag == -1) entertab(id,Function,None,blockCount);
+    //////////////////////////////
+    level = level + 1;          //
+    display[level] = blockCount;//
+    //////////////////////////////
     emit(FunctionOp,"0","0",id);
     paramList();
     insymbol();
@@ -162,6 +167,7 @@ void funcInsert(int intFlag){
         if(retFlag != 1 && (intFlag == 1 || intFlag == 0)) error(33);
     }
     //////////////////////////函数返回值检查
+    level = level - 1;
 }
 
 void program(){
@@ -186,7 +192,11 @@ void program(){
                 break;
             } else {
                 varInsert(intFlag);
-                if(curSy != SEMICOLON) error(32);
+                while(curSy == IDENTSY){
+                    insymbol();
+                    varInsert(intFlag);
+                }
+                if(curSy != SEMICOLON) error(32); //这里出错啦
             }
         } else error(32);
 
@@ -215,18 +225,21 @@ void program(){
                     insymbol();
                     if(curSy == LBRACE){
                         comstate();
+                        break; //编译结束
                     } else error(34);
                 } else error(34);
             } else error(34);
         } else error(32);
+
+        insymbol();
+
+        while(!(curSy == INTSY || curSy == CHARSY || curSy == VOIDSY)){
+                error(31);
+                insymbol();
+        }
     }
 
-    insymbol();
-
-    while(!(curSy == INTSY || curSy == CHARSY || curSy == VOIDSY)){
-            error(31);
-            insymbol();
-    }
+    printf("编译结束，(%d)错误\n",getErrorNum());
 
 }
 
@@ -305,7 +318,7 @@ void factor(){
             } else error(14);
         } else error(11);
         //////////////////////////////
-        if(idtabs[pos].type == Char) expreType = Char;
+        if(idtabs[pos].type == Char && expreType == None) expreType = Char;
         //////////////////////////////强制类型转换expreType
     } else if(curSy == PLUS || curSy == SUB){
         int sign = 1;
@@ -320,7 +333,7 @@ void factor(){
     } else if(curSy == CHARCON) {
         strcpy(retfactor,charToString(ichar));
         ///////////////////////////////
-        expreType = Char;
+        if(expreType == None) expreType = Char;
         ///////////////////////////////强制类型转换expreType
     } else if(curSy == LPARENT){
         insymbol();
@@ -341,7 +354,6 @@ void term(){
         expreType = Int;//表达式返回类型
         /////////////////////
         int multFlag = curSy == MULT ? 1 : 0;
-        expreType = Int; // 遇到乘号就进行相应的类型转换
         strcpy(termarg1,retfactor); // retfactor中始终应为最新的return寄存器值
         //////////////// 读取第二位因子
         factor();
@@ -359,7 +371,7 @@ void term(){
 
 void expression(){
     //insymbol();
-    expreType = Int;
+    expreType = None;
     if(curSy == PLUS || curSy == SUB){ //表达式第一项内容可以为+或-
         /////////////////////
         expreType = Int;//表达式返回类型
@@ -373,6 +385,9 @@ void expression(){
             term();
             strcpy(retexpre,retterm);
         }
+    } else {
+        term();
+        strcpy(retexpre,retterm);
     }
 
     while(curSy == PLUS || curSy == SUB){
@@ -389,6 +404,8 @@ void expression(){
 
         strcpy(retexpre,numToReg(tempregNum++));//表达式返回值更新
     }
+
+    if(expreType == None) expreType = Int;
 }
 
 

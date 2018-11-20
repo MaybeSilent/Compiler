@@ -249,7 +249,7 @@ void setup()
     //char filename[128];
     //printf("请输入编译文件名:");
     //scanf("%s",filename);
-    instream = fopen("E:\\workfile\\develop\\Compiler\\Compiler\\error.txt","r");
+    instream = fopen("E:\\workfile\\develop\\Compiler\\Compiler\\test.txt","r");
     if(instream == NULL)
     {
         printf("文件不存在");

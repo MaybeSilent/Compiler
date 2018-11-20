@@ -5,9 +5,7 @@
 
 void testParse(){
     setup();
-    insymbol();
-    varDec();
-    //constDec();
+    program();
     printtabs();
     printcodes();
 }
