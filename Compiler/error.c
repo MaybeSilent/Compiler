@@ -22,11 +22,20 @@ String errMessage[] = {
     "赋值类型必须为变量或者数组","赋值语句类型不匹配","条件语句出错","do-while语句出错",//17,18,19,20
     "scanf语句出错","scanf语句读入类型不匹配","printf语句出错","for语句出错",//21,22,23,24
     "变量类型错误",";缺失或者位置出错","函数调用参数错误","语句无法匹配","return语句出错",//25,26,27,28,29
-    "}缺失或位置出错","非法的开始字符","声明语句出错","函数返回值错误","main函数格式错误"//30,31,32,33,34
+    "}缺失或位置出错","非法的开始字符","声明语句出错","函数返回值错误","main函数格式错误",//30,31,32,33,34
+    "文件结束异常"//35
 };
 
 void error(int n){
     errorNum ++ ;
     printf(errMessage[n]);
     printf("：出错位置:%d行%d字符处标识符\n",countLine+1,countChar);
+}
+
+void errorjump(int n){
+    errorNum ++ ;
+    printf(errMessage[n]);
+    printf("：出错位置:%d行%d字符处标识符\n",countLine+1,countChar);
+    while(curSy != SEMICOLON) insymbol();
+    insymbol();
 }

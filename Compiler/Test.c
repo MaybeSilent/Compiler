@@ -6,14 +6,14 @@
 void testParse(){
     setup();
     program();
-    printtabs();
-    printcodes();
+    //printtabs();
+    //printcodes();
 }
 
 void testSymbol(){
     String symbolString[] = {
-        "CHARSY","CONSTSY","DOSY","ELSESY","FORSY","IFSY","INPUTSY","INTSY",
-        "MAINSY","OUTPUTSY","RETURNSY","VOIDSY","WHILESY",
+        "CHARSY","CONSTSY","DOSY","ELSESY","FORSY","IFSY","INTSY",
+        "MAINSY","OUTPUTSY","RETURNSY","INPUTSY","VOIDSY","WHILESY",
         "PLUS","SUB","MULT","DIV","LESS","LESSEQU","EQU","NOEQU","MORE","MOREEQU","BECOMESY","COMMA","SEMICOLON",
         "LPARENT","RPARENT","LBRACKET","RBRACKET","LBRACE","RBRACE",
         "IDENTSY","INTCON","CHARCON","STRINGCON"

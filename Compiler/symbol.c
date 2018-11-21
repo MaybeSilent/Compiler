@@ -201,8 +201,12 @@ void insymbol()
         curSy = sps[(int)ch];
         nextch();
     } else if(ch == EOF) {
-        printf("编译错误：程序不完整，编译提前结束\n");
-        exit(0);
+        if(curSy == FINISHED){
+            printf("文件提前结束，编译错误\n");
+            exit(0);
+        }
+        printf("文件读取结束\n");
+        curSy = FINISHED;
     }
 
     if(DEBUG)
@@ -222,11 +226,11 @@ void setup()
     key[3] = "else";
     key[4] = "for";
     key[5] = "if";
-    key[6] = "input";
-    key[7] = "int";
-    key[8] = "main";
-    key[9] = "output";
-    key[10] = "return";
+    key[6] = "int";
+    key[7] = "main";
+    key[8] = "printf";
+    key[9] = "return";
+    key[10] = "scanf";
     key[11] = "void";
     key[12] = "while";
 

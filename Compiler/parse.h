@@ -11,9 +11,10 @@ void term();
 void statement();
 void ifstate();
 
-//内部函数声明
 void statement();
 void state();
 void comstate();
+void callparm(int pos);
+int callfunction(int pos);
 
 #endif // PARSE_H_INCLUDED

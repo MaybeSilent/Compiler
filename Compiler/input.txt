@@ -20,8 +20,8 @@ void compareTwo(){
 }
 
 int getMult(int number){
-    if(number == 1) return 1;
-    return num*getMult(number - 1);
+    if(number == 1) return (1);
+    return (number*getMult(number - 1));
 }
 
 void testIf(){
@@ -63,8 +63,8 @@ void test_expression(int param_one , int param_two){
 
 void test_for(){
     int var_start,var_end;
-    scanf(var_start,var_end);
     int var_value;
+    scanf(var_start,var_end);
     for(var_value = var_start; var_value > var_end ; var_value = var_value - 2){
         printf(var_value);
         printf("\n");
@@ -93,4 +93,4 @@ void main(){
     scanf(param_one,param_two);
     test_expression(param_one,param_two);
     test_for();
-}	   
+}      

@@ -33,7 +33,7 @@ char paramName[32];
 
 void constDec(){
     if(DEBUG) printf("进入consDec\n");
-
+    if(grammer) printf("这是一条常量声明\n");
     insymbol();
 
     if(curSy == INTSY || curSy == CHARSY){
@@ -73,6 +73,9 @@ void constDec(){
 }
 
 void varInsert(int intFlag){
+
+    if(grammer) printf("这是一条变量声明\n");
+
     if(curSy == LBRACKET){
         insymbol();
         if(curSy == INTCON && inum != 0){
@@ -148,6 +151,7 @@ void paramList(){
 }
 
 void funcInsert(int intFlag){
+    if(grammer) printf("这是一条函数声明\n");
     /////////////////////////////
     enterblock();    //enterblock
     /////////////////////////////
@@ -162,7 +166,7 @@ void funcInsert(int intFlag){
     paramList();
     insymbol();
     if(curSy == LBRACE) {
-        int retFlag = 0;
+        retFlag = 0;
         comstate();               //复合语句
         if(retFlag != 1 && (intFlag == 1 || intFlag == 0)) error(33);
     }
@@ -216,8 +220,12 @@ void program(){
                 funcInsert(intFlag);
             } else error(32);
         } else if(curSy == MAINSY){
-            emit(MainOp,"0","0","0");
+            emit(Function,"0","0","main");
             enterblock();
+            //////////////////////////////
+            level = level + 1;          //
+            display[level] = blockCount;//
+            //////////////////////////////
             insymbol();
             if(curSy == LPARENT){
                 insymbol();
@@ -225,13 +233,13 @@ void program(){
                     insymbol();
                     if(curSy == LBRACE){
                         comstate();
+                        if(curSy != FINISHED) error(35);
                         break; //编译结束
                     } else error(34);
                 } else error(34);
             } else error(34);
         } else error(32);
 
-        insymbol();
 
         while(!(curSy == INTSY || curSy == CHARSY || curSy == VOIDSY)){
                 error(31);
@@ -244,36 +252,48 @@ void program(){
 }
 
 void comstate(){
+    if(grammer) printf("处理到复合语句\n");
+
     insymbol();
     while(curSy == CONSTSY){
         constDec();
         if(curSy != SEMICOLON) error(26);
-        insymbol();
+        else insymbol();
     }
     while(curSy == INTSY || curSy == CHARSY){
         varDec();
         if(curSy != SEMICOLON) error(26);
-        insymbol();
+        else insymbol();
     }
     while(curSy != RBRACE){
         state();
-        insymbol();
     }
+    insymbol(); // 读到右大括号后预读一位
 
 }
 
+int callfunction(int pos){
+    callparm(pos);
+    int retfunc = tempregNum;
+    if(idtabs[pos].type != None) emit(CallOp,idtabs[pos].name,"0",numToReg(tempregNum++));
+    else emit(CallOp,idtabs[pos].name,"0","0");
+    return retfunc;
+}
+
 void callparm(int pos){
+    if(grammer) printf("这是函数调用声明\n");
+
     enum typel params[128];
     int blockIndex = idtabs[pos].value;
     int n = blocktabs[blockIndex].parmnum - 1;
     int tabIndex = blocktabs[blockIndex].lastparm;
-    for( ; n >= 0 ; n --){//先确定parmList的参数类型
-        params[n] = idtabs[tabIndex].type;
+    int i = n;
+    for( ; i >= 0 ; i --){//先确定parmList的参数类型
+        params[i] = idtabs[tabIndex].type;
         tabIndex = idtabs[tabIndex].link;
     }
     ///////////////////
-    int i = 0;
-    for(i = 0 ; i < n ; i++){
+    for(i = 0 ; i <= n ; i++){
         insymbol();
         expression();
         emit(PushParmOp,"0","0",retexpre);
@@ -285,19 +305,25 @@ void callparm(int pos){
             error(15);
             return ;
         }
-        if(curSy != COMMA && i != n-1) error(27);
-        if(curSy != RPARENT && i == n -1) error(15);
+        if(curSy != COMMA && i != n) error(27);
+        if(curSy != RPARENT && i == n) error(15);
         //emit不用类型，函数参数都放在栈中或者寄存器之中
     }
+    if(curSy == LPARENT) insymbol();
 }
 
 //语法分析执行语句要检查相应的变量名是否存在
 void factor(){
     //insymbol(); 解析因子之时，可以默认为已经读入相应的内容
+    if(grammer) printf("处理到表达式因子\n");
+
     if(curSy == IDENTSY){
         int pos = loc(id);//IDENTSY可能为变量，可能为函数，也可能为数组
-        if(pos == -1) strcpy(retfactor,"NULL");
-        if(idtabs[pos].kind == Var){
+        if(pos == -1){
+            error(12);
+            return ;
+        }
+        if(idtabs[pos].kind == Var || idtabs[pos].kind == Const || idtabs[pos].kind == Parm){
             strcpy(retfactor,id);
         } else if(idtabs[pos].kind == Array){
             insymbol();
@@ -312,8 +338,8 @@ void factor(){
         } else if(idtabs[pos].kind == Function && idtabs[pos].type != None){ //调用的函数必须要有相应的返回值
             insymbol();
             if(curSy == LPARENT){
-                callparm(pos);
-                insymbol();
+                int tempreg = callfunction(pos);
+                strcpy(retfactor,numToReg(tempreg));
                 if(curSy != RPARENT) error(14);
             } else error(14);
         } else error(11);
@@ -347,6 +373,8 @@ void factor(){
 }
 
 void term(){
+    if(grammer) printf("处理到表达式项\n");
+
     factor();
     insymbol();
     while(curSy == MULT || curSy == DIV){
@@ -356,6 +384,7 @@ void term(){
         int multFlag = curSy == MULT ? 1 : 0;
         strcpy(termarg1,retfactor); // retfactor中始终应为最新的return寄存器值
         //////////////// 读取第二位因子
+        insymbol();
         factor();
         strcpy(termarg2,retfactor);
         ////////////////
@@ -370,6 +399,9 @@ void term(){
 
 
 void expression(){
+
+    if(grammer) printf("处理到表达式\n");
+
     //insymbol();
     expreType = None;
     if(curSy == PLUS || curSy == SUB){ //表达式第一项内容可以为+或-
@@ -418,6 +450,9 @@ void synanalysis(){
 //条件语句 if 开头
 //assign 要进行类型检查
 void assignstate(int pos){ //赋值语句预读入相应的标识符
+
+    if(grammer) printf("处理到赋值语句\n");
+
     if(idtabs[pos].kind == Array){
         insymbol();
         if(curSy == LBRACKET){
@@ -441,6 +476,9 @@ void genBackLabel(int codepos){
 }
 
 void judgestate(){
+
+    if(grammer) printf("处理到条件语句\n");
+
     insymbol();
     expression();
     strcpy(judgereg,retexpre);
@@ -448,15 +486,18 @@ void judgestate(){
     if(curSy == RPARENT){
         emit(NoequOp,judgereg,"0","0");
     } else if(curSy >= 17 && curSy <= 22){
+        enum ops ComOp = (enum ops)(curSy-5);
         insymbol();
         expression();
-        emit((enum ops)(curSy-5),judgereg,retexpre,"0");
-        insymbol();
-        if(curSy != RPARENT) error(19);
+        emit(ComOp,judgereg,retexpre,"0");
+        if(!(curSy == RPARENT || curSy == SEMICOLON)) error(19);
     } else error(19);
 }
 
 void ifstate(){
+
+    if(grammer) printf("处理到IF语句\n");
+
     insymbol();
     if(curSy == LPARENT){
         //////////////////////
@@ -467,7 +508,7 @@ void ifstate(){
 
         statement();
 
-        insymbol();
+        //insymbol();
         if(curSy == ELSESY){
             int elsecodepos = codeCount;
             emit(GotoOp,"0","0","0"); //  <--------------------------------
@@ -483,10 +524,12 @@ void ifstate(){
 
 void dowhilestate(){
     //do,while语句label不用进行相应的反填
+    if(grammer) printf("处理到dowhile语句\n");
+
     int dowhilelabel = labelNum;
     emit(LabelOp,"0","0",numToLabel(labelNum++));
     statement();
-    insymbol();
+    //insymbol();
     if(curSy == WHILESY){
         insymbol();
         if(curSy != LPARENT) error(20);
@@ -496,6 +539,8 @@ void dowhilestate(){
 }
 
 void forstate(){
+    if(grammer) printf("处理到for语句\n");
+
     int beforepos, afterpos, addFlag, step;
     insymbol();
     if(curSy == LPARENT){
@@ -504,11 +549,14 @@ void forstate(){
             insymbol();
             if(curSy == BECOMESY){
                 int pos = loc(id);
-                if(pos == -1) error(12);
+                if(pos == -1){
+                    error(12);
+                    return ;
+                }
                 insymbol();
                 expression();
                 emit(BecomeOp,retexpre,"0",idtabs[pos].name);
-                insymbol();
+                //insymbol(); expression已经有相应的预读取
                 if(curSy == SEMICOLON){
                     int forjudgeLabel = labelNum;
                     emit(LabelOp,"0","0",numToLabel(labelNum++));
@@ -555,13 +603,20 @@ void forstate(){
 }
 
 void readstate(){
+    if(grammer) printf("处理到读语句\n");
+
     insymbol();
     if(curSy == LPARENT){
         insymbol();
         while(curSy == IDENTSY){
             int pos = loc(id);
-            if(pos == -1) error(12);
-            if(idtabs[pos].kind != Var) error(22);
+            if(pos == -1){
+                error(12);
+                return ;
+            }
+            if(!(idtabs[pos].kind == Var||idtabs[pos].kind == Parm)) error(22);
+            if(idtabs[pos].type == Int) emit(ScanfOp,"int","0",idtabs[pos].name);
+            else if(idtabs[pos].type == Char) emit(ScanfOp,"char","0",idtabs[pos].name);
             insymbol();
             if(curSy == COMMA) insymbol();
         }
@@ -571,6 +626,9 @@ void readstate(){
 }
 
 void writestate(){
+
+    if(grammer) printf("处理到写语句\n");
+
     insymbol();
     if(curSy == LPARENT){
         insymbol();
@@ -578,10 +636,12 @@ void writestate(){
             strcpy(printreg[countprint],iString);
             emit(PrintfOp,"string","0",intToString(countprint++));
             insymbol();
-            if(curSy != COMMA){
-                insymbol();
-                return ;
-            }
+        }
+        if(curSy == RPARENT){
+            insymbol();
+            return ;
+        } else if(curSy == COMMA){
+            insymbol();
         }
 
         expression(); //expression 的前置insymbol已经在前面了
@@ -594,6 +654,9 @@ void writestate(){
 }
 
 void returnstate(){
+
+    if(grammer) printf("处理到返回语句\n");
+    retFlag = 1;
     insymbol();
     if(curSy == LPARENT){
         insymbol();
@@ -607,49 +670,63 @@ void returnstate(){
     }
 }
 
+void checkSem(){
+    if(curSy != SEMICOLON) error(26);
+    else insymbol();
+}
+
+
 void state(){
     if(curSy == IFSY){
         ifstate();
     } else if(curSy == DOSY){
         dowhilestate();
+        insymbol();
     } else if(curSy == FORSY){
         forstate();
     } else if(curSy == LBRACE){
         statement();
-        insymbol();
+        //insymbol();
         while(curSy != RBRACE){
             state();
-            insymbol();
+            //insymbol();
         }
+        insymbol();
     } else if(curSy == IDENTSY){
         int pos = loc(id);
-        if(pos == -1) error(12);
+        if(pos == -1){
+            errorjump(12);
+            return ;
+        }
         if(idtabs[pos].kind == Var || idtabs[pos].kind == Array){
             insymbol();
             if(curSy != BECOMESY) error(25);
             assignstate(pos);
-            if(curSy != SEMICOLON) error(26);
+            checkSem();
         } else if(idtabs[pos].kind == Function) {
-            callparm(pos);
             insymbol();
-            if(curSy != SEMICOLON) error(26);
+            if(curSy != LPARENT) error(14);
+            callfunction(pos);
+            insymbol();
+            checkSem();
         } else error(25);
     } else if(curSy == INPUTSY){
         readstate();
-        if(curSy != SEMICOLON) error(26);
+        checkSem();
     } else if(curSy == OUTPUTSY){
         writestate();
-        if(curSy != SEMICOLON) error(26);
+        checkSem();
     } else if(curSy == RETURNSY){
         retFlag = 1;
         returnstate();
-        if(curSy != SEMICOLON) error(26);
+        checkSem();
     } else if(curSy == SEMICOLON){
         //空语句
     } else {
         error(28);
         //直接跳转到下一句
         while(curSy != SEMICOLON) insymbol();
+        insymbol();
     }
 }
 

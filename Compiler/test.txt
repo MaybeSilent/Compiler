@@ -1,11 +1,96 @@
-const int a = 100;
-const int b = 2;
-int c;
-void test(){
-   int a;
-   a = 0;
-   a = a + 1;
+const int const_a = 10;
+const char const_b = 'b';
+const int const_less = -20 , const_more = +25;
+
+int var_a,var_b;
+int var_input_Mult;
+char var_c,var_d;
+char chars10;
+char var_string[100];
+
+void compareTwo(){
+    scanf(var_a,var_b);
+    if(var_a < var_b) printf("var_a < var_b");
+    if(var_a <= var_b) printf("var_a <= var_b");
+    if(var_a > var_b) printf("var_a > var_b");
+    if(var_a >= var_b) printf("var_a >= var_b");
+    if(var_a != var_b) printf("var_a != var_b");
+    if(var_a == var_b) printf("var_a == var_b");
+    printf("\n");
 }
+
+int getMult(int number){
+    if(number == 1) return (1);
+    return (number*getMult(number - 1));
+}
+
+void testIf(){
+    scanf(var_a);
+    if(var_a) printf("var_a");
+    else printf("not var_a");
+    printf("\n");
+}
+
+void test_do_while(){
+    int var_count;
+    int var_input;
+
+    var_count = 0;
+    do{
+        var_count = var_count + 1;
+        printf(var_count);
+        printf("\n");
+        scanf(var_input);
+    } while(var_input)
+}
+
+void test_expression(int param_one , int param_two){
+    printf(-param_one*param_two);
+    printf("\n");
+    printf(+param_one*param_two);
+    printf("\n");
+    printf(+param_one/param_two);
+    printf("\n");
+    printf(param_one*param_one + param_two*param_two);
+    printf("\n");
+    printf(param_one*2 + 100);
+    printf("\n");
+    printf(param_one + 'a');
+    printf("\n");
+    printf(param_two + 'b');
+    printf("\n");
+}
+
+void test_for(){
+    int var_start,var_end;
+    int var_value;
+    scanf(var_start,var_end);
+    for(var_value = var_start; var_value > var_end ; var_value = var_value - 2){
+        printf(var_value);
+        printf("\n");
+    }
+    for(var_value = var_start; var_value < var_end ; var_value = var_value + 1){
+        printf(var_value);
+        printf("\n");
+    }
+    for(var_value = var_start; var_value < var_end ; var_value = var_value + 2){
+        printf(var_value);
+        printf("\n");
+    }
+}
+
 void main(){
-    
-}
+    int var_input_Mult;
+    int param_one,param_two;
+
+
+    compareTwo();
+    scanf(var_input_Mult);
+    printf("Mult's result is:",getMult(var_input_Mult));
+    printf("\n");
+    testIf();
+    test_do_while();
+    scanf(param_one,param_two);
+    test_expression(param_one,param_two);
+    test_for();
+}      

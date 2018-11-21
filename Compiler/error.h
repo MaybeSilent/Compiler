@@ -2,6 +2,7 @@
 #define ERROR_H_INCLUDED
 
 void error(int n);
+void errorjump(int n);
 
 int getErrorNum();
 

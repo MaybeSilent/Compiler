@@ -89,7 +89,8 @@ String numToReg(int n){
 }
 
 void printtabs(){
-    String kindString[] = {"const","var","array","function"};
+    //Const,Var,Array,Function,Parm
+    String kindString[] = {"const","var","array","function","parm"};
     String typeString[] = {"int","char","none"};
     printf("%15s %15s %15s %15s %15s\n","name","kind","type","value","link");
     int i = 1 ;
@@ -110,7 +111,7 @@ enum ops{
 
 void printcodes(){
     printf("<<<<<<<<<<<midcodes>>>>>>>>>>>>\n");
-    String opstring[] = {"const","var","array","function","param","push","getArray","*","/","+","-",
+    String opstring[] = {"const","var","array","function","param","push","call","getArray","*","/","+","-",
                         "=","<","<=","==","!=",">",">=",
                         "falsegoto","truegoto","goto","label","scanf","printf","ret","main"};
     printf("%15s %15s %15s %15s\n","opeartion","arg1","arg2","result");
