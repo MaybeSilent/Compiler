@@ -2,12 +2,16 @@
 #include "parse.h"
 #include "symbol.h"
 #include "util.h"
+#include "midTomips.h"
 
 void testParse(){
     setup();
     program();
-    //printtabs();
-    //printcodes();
+    printtabs();
+    printcodes();
+    printstring();
+    midToMips();
+    printmips(text);
 }
 
 void testSymbol(){

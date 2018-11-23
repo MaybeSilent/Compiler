@@ -1,15 +1,30 @@
 #include "types.h"
 #include "error.h"
-
+#include "util.h"
 
 char numstring[32];
 char charstring[32];
 char tempreg[32];
 char labelreg[32];
+char strconreg[32];
+
+int stringToInt(String in){
+    return atoi(in);
+}
+
+int charToInt(String in){
+    return in[0];
+}
 
 String intToString(int inum){
     itoa(inum,numstring,10);
     return numstring;
+}
+
+String getStringCon(int count){
+    strcpy(strconreg,"string_");
+    strcat(strconreg,intToString(count));
+    return strconreg;
 }
 
 String charToString(char ichar){
@@ -22,6 +37,17 @@ String numToLabel(int n){
     strcpy(labelreg,"label_");
     strcat(labelreg,intToString(n));
     return labelreg;
+}
+
+int insertString(String instring){
+    int i = 0;
+    for(i = 0 ; i < countprint ; i ++){
+        if(strcmp(printreg[i],instring) == 0){
+            return i;
+        }
+    }
+    strcpy(printreg[countprint],instring);
+    return countprint++;
 }
 
 void enterblock(){
@@ -82,11 +108,19 @@ void emit(enum ops op, String arg1, String arg2, String result){
 
 
 String numToReg(int n){
-    tempreg[0] = '$';
-    tempreg[1] = '\0';
+    strcpy(tempreg,"$Reg");
     strcat(tempreg,intToString(n));
     return tempreg;
 }
+
+MipsPtr addNext(MipsPtr inptr , String instring){
+    MipsPtr nextptr = (MipsPtr)malloc(sizeof(MipsCode));
+    memset(nextptr,0,sizeof(MipsCode));
+    inptr->next = nextptr;
+    strcpy(nextptr->code,instring);
+    return nextptr;
+}
+
 
 void printtabs(){
     //Const,Var,Array,Function,Parm
@@ -118,5 +152,26 @@ void printcodes(){
     int i = 0 ;
     for( ; i <  codeCount ; i++){
         printf("%15s %15s %15s %15s\n",opstring[codes[i].op],codes[i].arg1,codes[i].arg2,codes[i].result);
+    }
+}
+
+void printstring(){
+    printf("<<<<<<<<<<<strings>>>>>>>>>>>>\n");
+    int i = 0 ;
+    for( i = 0 ; i < countprint ; i++){
+        printf("%d:%s\n",i,printreg[i]);
+    }
+}
+
+void printmips(MipsPtr ptr){
+    printf("<<<<<<<<<<<<<mips>>>>>>>>>>>>>>\n");
+    int i = 0 ;
+    for(i = 0 ; i < dataCount ; i++){
+        printf("%s\n",dataVariable[i]);
+    }
+
+    while(ptr != NULL){
+        printf("%s\n",ptr->code);
+        ptr = ptr->next;
     }
 }

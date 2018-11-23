@@ -7,7 +7,7 @@
 #include <ctype.h>
 
 #define DEBUG 0
-#define grammer 1
+#define grammer 0
 
 typedef char* String;
 
@@ -81,5 +81,23 @@ int codeCount;
 int level;
 int display[128]; //display区记录，记录了上一层block在btab的位置
 
+char printreg[64][1024];
+int countprint;
+
+void printstring();
+
+char dataVariable[128][1024];
+int dataCount;
+
+struct mipsCode{
+    char code[64];
+    struct mipsCode* next;
+};
+typedef struct mipsCode* MipsPtr;
+typedef struct mipsCode MipsCode;
+
+MipsPtr data;
+MipsPtr text;
+MipsPtr _main_;
 
 #endif // TYPES_H_INCLUDED

@@ -13,9 +13,6 @@ enum typel retType; //返回语句的返回值类型
 
 int retFlag;
 
-char printreg[32][1024];
-int countprint;
-
 char retfactor[32];
 char retterm[32];
 char retexpre[32];
@@ -625,6 +622,7 @@ void readstate(){
     } else error(21);
 }
 
+
 void writestate(){
 
     if(grammer) printf("处理到写语句\n");
@@ -633,8 +631,8 @@ void writestate(){
     if(curSy == LPARENT){
         insymbol();
         if(curSy == STRINGCON){
-            strcpy(printreg[countprint],iString);
-            emit(PrintfOp,"string","0",intToString(countprint++));
+            int index = insertString(iString);
+            emit(PrintfOp,"string","0",getStringCon(index));
             insymbol();
         }
         if(curSy == RPARENT){
