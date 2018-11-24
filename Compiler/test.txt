@@ -1,14 +1,17 @@
 int third;
+int array[10];
 
-int test(){
-    int first;
+int test(char nextchar){
+    const int fifth = 6;
+    const int forth = 6;
     int second;
-    first = 1;
-    second = 2;
-    return (third+second);
+    array[5] = 7;
+    second = array[5];
+    third = fifth*8 + second*9 + 120*150;
+    return (forth+second);
 }
 
 void main(){
-    third = 3;
-    test();  
+    third = 3+7+8;
+    test('a');  
 }

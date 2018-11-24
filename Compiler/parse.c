@@ -149,6 +149,7 @@ void paramList(){
 
 void funcInsert(int intFlag){
     if(grammer) printf("这是一条函数声明\n");
+    tempregNum = 0; ////////////////////////临时寄存器清零
     /////////////////////////////
     enterblock();    //enterblock
     /////////////////////////////
@@ -217,6 +218,7 @@ void program(){
                 funcInsert(intFlag);
             } else error(32);
         } else if(curSy == MAINSY){
+            tempregNum = 0; ///////////////////////将临时寄存器清零
             emit(Function,"0","0","main");
             enterblock();
             //////////////////////////////
@@ -269,12 +271,10 @@ void comstate(){
 
 }
 
-int callfunction(int pos){
+void callfunction(int pos){
     callparm(pos);
-    int retfunc = tempregNum;
-    if(idtabs[pos].type != None) emit(CallOp,idtabs[pos].name,"0",numToReg(tempregNum++));
+    if(idtabs[pos].type != None) emit(CallOp,idtabs[pos].name,"0","$RegRet");
     else emit(CallOp,idtabs[pos].name,"0","0");
-    return retfunc;
 }
 
 void callparm(int pos){
@@ -293,7 +293,8 @@ void callparm(int pos){
     for(i = 0 ; i <= n ; i++){
         insymbol();
         expression();
-        emit(PushParmOp,"0","0",retexpre);
+        if(expreType == Char) emit(PushParmOp,"0","0",intToString(charToInt(retexpre)));
+        else emit(PushParmOp,"0","0",retexpre);
         if(expreType == Int){
             if(params[i] != Int) error(16);
         } else if(expreType == Char){
@@ -324,19 +325,18 @@ void factor(){
             strcpy(retfactor,id);
         } else if(idtabs[pos].kind == Array){
             insymbol();
-            if(curSy == LPARENT){
+            if(curSy == LBRACKET){
                 insymbol();
                 expression();
                 emit(GetArrayOp,idtabs[pos].name,retexpre,numToReg(tempregNum));//此处要进行相应的处理
                 strcpy(retfactor,numToReg(tempregNum++));
             }else error(13);
-            insymbol();
-            if(curSy != RPARENT) error(13);
+            if(curSy != RBRACKET) error(13);
         } else if(idtabs[pos].kind == Function && idtabs[pos].type != None){ //调用的函数必须要有相应的返回值
             insymbol();
             if(curSy == LPARENT){
-                int tempreg = callfunction(pos);
-                strcpy(retfactor,numToReg(tempreg));
+                callfunction(pos);
+                strcpy(retfactor,"$RegRet");
                 if(curSy != RPARENT) error(14);
             } else error(14);
         } else error(11);
@@ -386,8 +386,8 @@ void term(){
         strcpy(termarg2,retfactor);
         ////////////////
         if(multFlag) emit(MultOp,termarg1,termarg2,numToReg(tempregNum));
-        else emit(MultOp,termarg1,termarg2,numToReg(tempregNum));
-        strcpy(retfactor,numToReg(tempregNum++));
+        else emit(DivOp,termarg1,termarg2,numToReg(tempregNum));
+        strcpy(retfactor,numToReg(tempregNum));
 
         insymbol(); //term 预读取了下一位用于判断
     }
@@ -398,8 +398,8 @@ void term(){
 void expression(){
 
     if(grammer) printf("处理到表达式\n");
+    int regExpr = tempregNum;
 
-    //insymbol();
     expreType = None;
     if(curSy == PLUS || curSy == SUB){ //表达式第一项内容可以为+或-
         /////////////////////
@@ -407,8 +407,8 @@ void expression(){
         /////////////////////
         if(curSy == SUB){
             term(); //term 已经预读取了一位进行相应的判断
-            emit(MultOp,"-1",retterm,numToReg(tempregNum));
-            strcpy(retexpre,numToReg(tempregNum++));
+            emit(MultOp,"-1",retterm,numToReg(regExpr));
+            strcpy(retexpre,numToReg(regExpr));
         } //如果为-，则需要进行计算
         else{
             term();
@@ -426,12 +426,13 @@ void expression(){
         int addFlag = (curSy == PLUS) ? 1 : 0;
         insymbol();
         strcpy(exprearg1,retexpre);
+        tempregNum = regExpr + 1;
         term(); //此处term已经预读取了下一位内容
         strcpy(exprereg2,retterm);
-        if(addFlag) emit(AddOp,exprearg1,exprereg2,numToReg(tempregNum));
-        else emit(SubOp,exprearg1,exprereg2,numToReg(tempregNum));
+        if(addFlag) emit(AddOp,exprearg1,exprereg2,numToReg(regExpr));
+        else emit(SubOp,exprearg1,exprereg2,numToReg(regExpr));
 
-        strcpy(retexpre,numToReg(tempregNum++));//表达式返回值更新
+        strcpy(retexpre,numToReg(regExpr));//表达式返回值更新
     }
 
     if(expreType == None) expreType = Int;
@@ -449,21 +450,34 @@ void synanalysis(){
 void assignstate(int pos){ //赋值语句预读入相应的标识符
 
     if(grammer) printf("处理到赋值语句\n");
-
+    int regindex = tempregNum;
     if(idtabs[pos].kind == Array){
+        char indexreg[32];
         insymbol();
         if(curSy == LBRACKET){
             insymbol();
             expression(); //预读取了一位
+            strcpy(indexreg,retexpre);
+
+            if(curSy != RBRACKET) error(13);
+            else insymbol();
+            if(curSy != BECOMESY) error(17);
+            else insymbol();
+            expression();
             if(expreType != idtabs[pos].type) error(18);
-            emit(BecomeOp,retexpre,"0",idtabs[pos].name); //分号丢到外面检查
+
+            emit(BecomeOp,retexpre,indexreg,idtabs[pos].name); //分号丢到外面检查
         } else error(13);
     } else if(idtabs[pos].kind == Var) {
         insymbol();
+        if(curSy != BECOMESY) error(17);
+        else insymbol();
         expression();
         if(expreType != idtabs[pos].type) error(18); //类型检查语句
         emit(BecomeOp,retexpre,"0",idtabs[pos].name);
     } else error(17);
+    tempregNum = regindex;
+
 }
 //生成相应的label，并对label之前的标号位置进行反填
 void genBackLabel(int codepos){
@@ -628,6 +642,7 @@ void writestate(){
     if(grammer) printf("处理到写语句\n");
 
     insymbol();
+    int regNum = tempregNum;
     if(curSy == LPARENT){
         insymbol();
         if(curSy == STRINGCON){
@@ -649,6 +664,8 @@ void writestate(){
         if(curSy != RPARENT) error(23);
         else insymbol();
     }
+
+    tempregNum = regNum;
 }
 
 void returnstate(){
@@ -697,8 +714,6 @@ void state(){
             return ;
         }
         if(idtabs[pos].kind == Var || idtabs[pos].kind == Array){
-            insymbol();
-            if(curSy != BECOMESY) error(25);
             assignstate(pos);
             checkSem();
         } else if(idtabs[pos].kind == Function) {
