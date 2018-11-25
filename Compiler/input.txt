@@ -83,6 +83,12 @@ void main(){
     int var_input_Mult;
     int param_one,param_two;
 
+    scanf(var_c);
+    scanf(var_d);
+    scanf(chars10);
+    printf(var_c);
+    printf(var_d);
+    printf(chars10);
 
     compareTwo();
     scanf(var_input_Mult);

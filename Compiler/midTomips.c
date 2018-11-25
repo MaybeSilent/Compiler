@@ -15,6 +15,8 @@ char mipsCon[64];
 char findreg[32];
 char regChar[8];
 
+char arg1reg[32],arg2reg[32];
+
 int used[7];
 
 void getregChar(String in){
@@ -108,6 +110,22 @@ int judgekind(String in,String reg){
     }
 }
 
+MipsPtr getargs(String arg1 , String arg2 , MipsPtr ptr){
+    int kind = judgekind(arg1,"$t8");
+    if(kind == 0) strcpy(arg1reg,arg1);
+    else {
+        ptr = addNext(ptr,mipsCon);
+        strcpy(arg1reg,"$t8");
+    }
+    kind = judgekind(arg2,"$t9");
+    if(kind == 0) strcpy(arg2reg,arg2);
+    else {
+        ptr = addNext(ptr,mipsCon);
+        strcpy(arg2reg,"$t9");
+    }
+    return ptr;
+}
+
 MipsPtr sentences(MipsPtr ptr){
     if(codes[nowCode].op == BecomeOp){
         char resultReg[32];
@@ -121,21 +139,9 @@ MipsPtr sentences(MipsPtr ptr){
             ptr = addNext(ptr,mipsCon);
             sprintf(mipsCon,"sw $t8 %s",resultReg);
         }
-        ptr = addNext(ptr,mipsCon);
     } else if(codes[nowCode].op == AddOp || codes[nowCode].op == SubOp || codes[nowCode].op == MultOp || codes[nowCode].op == DivOp){
-        char arg1reg[32],arg2reg[32];
-        int kind = judgekind(codes[nowCode].arg1,"$t8");
-        if(kind == 0) strcpy(arg1reg,codes[nowCode].arg1);
-        else {
-            ptr = addNext(ptr,mipsCon);
-            strcpy(arg1reg,"$t8");
-        }
-        kind = judgekind(codes[nowCode].arg2,"$t9");
-        if(kind == 0) strcpy(arg2reg,codes[nowCode].arg2);
-        else {
-            ptr = addNext(ptr,mipsCon);
-            strcpy(arg2reg,"$t9");
-        }
+        ptr = getargs(codes[nowCode].arg1,codes[nowCode].arg2,ptr);
+        //获取参数的形式
         if(codes[nowCode].op == AddOp) sprintf(mipsCon,"add %s %s %s",arg1reg,arg2reg,codes[nowCode].result);
         else if(codes[nowCode].op == SubOp) sprintf(mipsCon,"sub %s %s %s",arg1reg,arg2reg,codes[nowCode].result);
         else if(codes[nowCode].op == MultOp) {
@@ -147,7 +153,6 @@ MipsPtr sentences(MipsPtr ptr){
             ptr = addNext(ptr,mipsCon);
             sprintf(mipsCon,"move %s $lo",codes[nowCode].result);
         }
-        ptr = addNext(ptr,mipsCon);
     } else if(codes[nowCode].op == GetArrayOp){
         find(codes[nowCode].arg1,stringToInt(codes[nowCode].arg2));
         sprintf(mipsCon,"lw %s %s",codes[nowCode].result,findreg);
@@ -162,17 +167,59 @@ MipsPtr sentences(MipsPtr ptr){
                 strcpy(pushreg,"$t8");
             }
             sprintf(mipsCon,"sw %s %d($sp)",pushreg,count);
-            ptr = addNext(ptr,mipsCon);
             nowCode ++;
             count -= 4;
         }
     } else if(codes[nowCode].op == LabelOp){
         sprintf(mipsCon,"%s:",codes[nowCode].result);
-        ptr = addNext(ptr,mipsCon);
     } else if(codes[nowCode].op >= 13 && codes[nowCode].op <= 18){
         //">=", "sge", ">", "sgt", "<=", "sle", "<", "slt", "==", "seq", "!=", "sne"
+        //LessOp,LessequOp,EquOp,NoequOp,MoreOp,MoreequOp  比较的结果保留在$t8寄存器之中
+        String comops[6] = {"slt","sle","seq","sne","sgt","sge"};
+        ptr = getargs(codes[nowCode].arg1,codes[nowCode].arg2,ptr);
+        sprintf(mipsCon,"%s $t8 %s %s",comops[codes[nowCode].op-13],arg1reg,arg2reg);
+    } else if(codes[nowCode].op == GotoOp) {
+        sprintf(mipsCon,"j %s",codes[nowCode].result);
+    } else if(codes[nowCode].op == FalseOp || codes[nowCode].op == TrueOp){
+        sprintf(mipsCon,"beq $t8 %d %s",codes[nowCode].op == TrueOp,codes[nowCode].result);
+    } else if(codes[nowCode].op == CallOp){
+        sprintf(mipsCon,"jal %s",codes[nowCode].result);
+        ptr = addNext(ptr,mipsCon);
+        ptr = addNext(ptr,"move $sp $fp");
+        ptr = addNext(ptr,"lw $fp 0($sp)");
+        sprintf(mipsCon,"lw $ra 4($sp)");
+    } else if(codes[nowCode].op == ScanfOp){
+        int scanftype = strcmp(codes[nowCode].arg1,"int") == 0 ? 5 : 12 ;
+        sprintf(mipsCon,"li $v0 %d",scanftype);
+        ptr = addNext(ptr,mipsCon);
+        ptr = addNext(ptr,"syscall");
+        find(codes[nowCode].result,0);
+        sprintf(mipsCon,"sw $v0 %s",findreg);
+    } else if(codes[nowCode].op == PrintfOp){
+        int printftype = strcmp(codes[nowCode].arg1,"int") == 0 ? 1 : strcmp(codes[nowCode].arg1,"char") == 0 ? 11 : 4;
+        if(printftype == 4) {
+            sprintf(mipsCon,"li $a0 %s",codes[nowCode].result);
+        } else {
+            char outreg[32];
+            int kind = judgekind(codes[nowCode].result,"$t8");
+            if(kind == 0) strcpy(outreg,codes[nowCode].result);
+            else {
+                ptr = addNext(ptr,mipsCon);
+                strcpy(outreg,"$t8");
+            }
+            sprintf(mipsCon,"li $a0 %s",outreg);
+        }
+        ptr = addNext(ptr,mipsCon);
+        sprintf(mipsCon,"li $v0 %d",printftype);
+        ptr = addNext(ptr,mipsCon);
+        sprintf(mipsCon,"syscall");
+    }else if(codes[nowCode].op == RetOp){
+        sprintf(mipsCon,"jr $ra");
+    } else {
+        return ptr;
     }
 
+    ptr = addNext(ptr,mipsCon);
     nowCode ++;
     return ptr;
 }
@@ -188,7 +235,11 @@ MipsPtr funcMidCodes(MipsPtr ptr){
         addVariable(4,0);
         nowCode ++;
     }
-    declarMidCodes(ptr,0);
+    ptr = declarMidCodes(ptr,0);
+    while(codes[nowCode].op != FunctionOp && nowCode < codeCount){
+        ptr = sentences(ptr);
+    }
+
     return ptr;
 }
 
