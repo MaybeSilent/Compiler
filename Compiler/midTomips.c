@@ -1,6 +1,6 @@
 #include "types.h"
 #include "util.h"
-
+/*
 int nowCode;
 
 char globalVariable[4096][128];
@@ -183,7 +183,7 @@ MipsPtr sentences(MipsPtr ptr){
     } else if(codes[nowCode].op == FalseOp || codes[nowCode].op == TrueOp){
         sprintf(mipsCon,"beq $t8 %d %s",codes[nowCode].op == TrueOp,codes[nowCode].result);
     } else if(codes[nowCode].op == CallOp){
-        sprintf(mipsCon,"jal %s",codes[nowCode].result);
+        sprintf(mipsCon,"jal %s",codes[nowCode].arg1);
         ptr = addNext(ptr,mipsCon);
         ptr = addNext(ptr,"move $sp $fp");
         ptr = addNext(ptr,"lw $fp 0($sp)");
@@ -263,3 +263,4 @@ void midToMips(){
     fillText();
 
 }
+*/

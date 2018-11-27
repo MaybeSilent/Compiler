@@ -1,17 +1,10 @@
-int third;
-int array[10];
-
-int test(char nextchar){
-    const int fifth = 6;
-    const int forth = 6;
-    int second;
-    array[5] = 7;
-    second = array[5];
-    third = fifth*8 + second*9 + 120*150;
-    return (forth+second);
+int feb(int n){
+    if(n < 2) return (1);
+    else return (feb(n-1)+feb(n-2));
 }
 
 void main(){
-    third = 3+7+8;
-    test('a');  
+    int a ;
+    a = a + 3*4+5*6*7*8;
+    feb(6); 
 }

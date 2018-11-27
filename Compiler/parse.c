@@ -13,20 +13,19 @@ enum typel retType; //返回语句的返回值类型
 
 int retFlag;
 
+int factorConst;
+int factorValue;
+
+int termConst;
+int termValue;
+
 char retfactor[32];
 char retterm[32];
 char retexpre[32];
 
-char termarg1[32];
-char termarg2[32];
-
-char exprearg1[32];
-char exprereg2[32];
-
 char judgereg[32];
 
 char paramName[32];
-
 
 void constDec(){
     if(DEBUG) printf("进入consDec\n");
@@ -149,7 +148,6 @@ void paramList(){
 
 void funcInsert(int intFlag){
     if(grammer) printf("这是一条函数声明\n");
-    tempregNum = 0; ////////////////////////临时寄存器清零
     /////////////////////////////
     enterblock();    //enterblock
     /////////////////////////////
@@ -218,7 +216,6 @@ void program(){
                 funcInsert(intFlag);
             } else error(32);
         } else if(curSy == MAINSY){
-            tempregNum = 0; ///////////////////////将临时寄存器清零
             emit(Function,"0","0","main");
             enterblock();
             //////////////////////////////
@@ -271,12 +268,6 @@ void comstate(){
 
 }
 
-void callfunction(int pos){
-    callparm(pos);
-    if(idtabs[pos].type != None) emit(CallOp,idtabs[pos].name,"0","$RegRet");
-    else emit(CallOp,idtabs[pos].name,"0","0");
-}
-
 void callparm(int pos){
     if(grammer) printf("这是函数调用声明\n");
 
@@ -307,14 +298,15 @@ void callparm(int pos){
         if(curSy != RPARENT && i == n) error(15);
         //emit不用类型，函数参数都放在栈中或者寄存器之中
     }
-    if(curSy == LPARENT) insymbol();
+    if(curSy == LPARENT) insymbol(); //无参数函数调用
 }
 
 //语法分析执行语句要检查相应的变量名是否存在
 void factor(){
     //insymbol(); 解析因子之时，可以默认为已经读入相应的内容
     if(grammer) printf("处理到表达式因子\n");
-
+    int constsign = (curSy == INTCON)||(curSy==CHARCON);
+    /////常数优化临时变量
     if(curSy == IDENTSY){
         int pos = loc(id);//IDENTSY可能为变量，可能为函数，也可能为数组
         if(pos == -1){
@@ -323,6 +315,10 @@ void factor(){
         }
         if(idtabs[pos].kind == Var || idtabs[pos].kind == Const || idtabs[pos].kind == Parm){
             strcpy(retfactor,id);
+            if(idtabs[pos].kind == Const){
+                constsign = 1;
+                factorValue = idtabs[pos].value;
+            }
         } else if(idtabs[pos].kind == Array){
             insymbol();
             if(curSy == LBRACKET){
@@ -335,8 +331,9 @@ void factor(){
         } else if(idtabs[pos].kind == Function && idtabs[pos].type != None){ //调用的函数必须要有相应的返回值
             insymbol();
             if(curSy == LPARENT){
-                callfunction(pos);
-                strcpy(retfactor,"$RegRet");
+                callparm(pos);
+                emit(CallOp,idtabs[pos].name,"0",numToReg(tempregNum));
+                strcpy(retfactor,numToReg(tempregNum++));
                 if(curSy != RPARENT) error(14);
             } else error(14);
         } else error(11);
@@ -352,8 +349,10 @@ void factor(){
             strcpy(retfactor,intToString(inum));
         } else error(10);
     } else if(curSy == INTCON){
+        factorValue = inum;
         strcpy(retfactor,intToString(inum));
     } else if(curSy == CHARCON) {
+        factorValue = (int)ichar;
         strcpy(retfactor,charToString(ichar));
         ///////////////////////////////
         if(expreType == None) expreType = Char;
@@ -362,43 +361,57 @@ void factor(){
         insymbol();
         expression();
         strcpy(retfactor,retexpre);//调用表达式相应代码
-        insymbol();
         if(curSy == RPARENT){
             expreType = Int;
         } else error(11);
     } else error(11);
+    factorConst = constsign;
 }
 
 void term(){
     if(grammer) printf("处理到表达式项\n");
+    char termarg1[32] = {0},termarg2[32] = {0};
 
+    int termsign = 0;
     factor();
+    if(factorConst){
+        termsign = 1;
+        termValue = factorValue;
+    }
+
+    strcpy(retterm,retfactor);
     insymbol();
     while(curSy == MULT || curSy == DIV){
         /////////////////////
         expreType = Int;//表达式返回类型
         /////////////////////
         int multFlag = curSy == MULT ? 1 : 0;
-        strcpy(termarg1,retfactor); // retfactor中始终应为最新的return寄存器值
+        strcpy(termarg1,retterm); // retfactor中始终应为最新的return寄存器值
         //////////////// 读取第二位因子
         insymbol();
         factor();
-        strcpy(termarg2,retfactor);
-        ////////////////
-        if(multFlag) emit(MultOp,termarg1,termarg2,numToReg(tempregNum));
-        else emit(DivOp,termarg1,termarg2,numToReg(tempregNum));
-        strcpy(retfactor,numToReg(tempregNum));
+        if(!factorConst) termsign = 0;
+
+        if(termsign){
+            if(multFlag) termValue *= factorValue;
+            else termValue /= factorValue;
+            strcpy(retterm,intToString(termValue));
+        } else {
+            strcpy(termarg2,retfactor);
+            if(multFlag) emit(MultOp,termarg1,termarg2,numToReg(tempregNum));
+            else emit(DivOp,termarg1,termarg2,numToReg(tempregNum));
+            strcpy(retterm,numToReg(tempregNum++));
+        }
 
         insymbol(); //term 预读取了下一位用于判断
     }
-    strcpy(retterm,retfactor);
+    termConst = termsign;
 }
 
 
 void expression(){
-
+    char exprearg1[32] = {0},exprereg2[32]={0};
     if(grammer) printf("处理到表达式\n");
-    int regExpr = tempregNum;
 
     expreType = None;
     if(curSy == PLUS || curSy == SUB){ //表达式第一项内容可以为+或-
@@ -407,8 +420,8 @@ void expression(){
         /////////////////////
         if(curSy == SUB){
             term(); //term 已经预读取了一位进行相应的判断
-            emit(MultOp,"-1",retterm,numToReg(regExpr));
-            strcpy(retexpre,numToReg(regExpr));
+            emit(MultOp,"-1",retterm,numToReg(tempregNum));
+            strcpy(retexpre,numToReg(tempregNum++));
         } //如果为-，则需要进行计算
         else{
             term();
@@ -418,7 +431,8 @@ void expression(){
         term();
         strcpy(retexpre,retterm);
     }
-
+    int constsign = termConst;
+    int expreValue = termValue;
     while(curSy == PLUS || curSy == SUB){
         /////////////////////
         expreType = Int;//表达式返回类型
@@ -426,13 +440,21 @@ void expression(){
         int addFlag = (curSy == PLUS) ? 1 : 0;
         insymbol();
         strcpy(exprearg1,retexpre);
-        tempregNum = regExpr + 1;
         term(); //此处term已经预读取了下一位内容
-        strcpy(exprereg2,retterm);
-        if(addFlag) emit(AddOp,exprearg1,exprereg2,numToReg(regExpr));
-        else emit(SubOp,exprearg1,exprereg2,numToReg(regExpr));
+        if(!termConst) constsign = 0;
 
-        strcpy(retexpre,numToReg(regExpr));//表达式返回值更新
+        if(constsign){
+            if(addFlag) expreValue += termValue;
+            else expreValue -= termValue;
+            strcpy(retexpre,intToString(expreValue));
+        } else {
+            strcpy(exprereg2,retterm);
+            if(addFlag) emit(AddOp,exprearg1,exprereg2,numToReg(tempregNum));
+            else emit(SubOp,exprearg1,exprereg2,numToReg(tempregNum));
+
+            strcpy(retexpre,numToReg(tempregNum++));//表达式返回值更新
+        }
+
     }
 
     if(expreType == None) expreType = Int;
@@ -450,7 +472,7 @@ void synanalysis(){
 void assignstate(int pos){ //赋值语句预读入相应的标识符
 
     if(grammer) printf("处理到赋值语句\n");
-    int regindex = tempregNum;
+
     if(idtabs[pos].kind == Array){
         char indexreg[32];
         insymbol();
@@ -476,7 +498,6 @@ void assignstate(int pos){ //赋值语句预读入相应的标识符
         if(expreType != idtabs[pos].type) error(18); //类型检查语句
         emit(BecomeOp,retexpre,"0",idtabs[pos].name);
     } else error(17);
-    tempregNum = regindex;
 
 }
 //生成相应的label，并对label之前的标号位置进行反填
@@ -642,7 +663,6 @@ void writestate(){
     if(grammer) printf("处理到写语句\n");
 
     insymbol();
-    int regNum = tempregNum;
     if(curSy == LPARENT){
         insymbol();
         if(curSy == STRINGCON){
@@ -664,8 +684,6 @@ void writestate(){
         if(curSy != RPARENT) error(23);
         else insymbol();
     }
-
-    tempregNum = regNum;
 }
 
 void returnstate(){
@@ -719,7 +737,8 @@ void state(){
         } else if(idtabs[pos].kind == Function) {
             insymbol();
             if(curSy != LPARENT) error(14);
-            callfunction(pos);
+            callparm(pos);
+            emit(CallOp,idtabs[pos].name,"0","0");
             insymbol();
             checkSem();
         } else error(25);

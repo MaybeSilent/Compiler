@@ -10,8 +10,8 @@ void testParse(){
     printtabs();
     printcodes();
     printstring();
-    midToMips();
-    printmips(text);
+    //midToMips();
+    //printmips(text);
 }
 
 void testSymbol(){

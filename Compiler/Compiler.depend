@@ -3,7 +3,7 @@
 	"test.h"
 	"parse.h"
 
-1543060638 source:e:\workfile\develop\compiler\compiler\parse.c
+1543288270 source:e:\workfile\develop\compiler\compiler\parse.c
 	"symbol.h"
 	"types.h"
 	"parse.h"
@@ -29,7 +29,7 @@
 
 1542421113 e:\workfile\develop\compiler\compiler\symbol.h
 
-1543060831 source:e:\workfile\develop\compiler\compiler\symbol.c
+1543288860 source:e:\workfile\develop\compiler\compiler\symbol.c
 	"symbol.h"
 	"types.h"
 	"error.h"
@@ -40,7 +40,7 @@
 	"types.h"
 	"symbol.h"
 
-1542898673 source:e:\workfile\develop\compiler\compiler\test.c
+1543294788 source:e:\workfile\develop\compiler\compiler\test.c
 	"types.h"
 	"parse.h"
 	"symbol.h"
@@ -51,14 +51,21 @@
 
 1542898804 e:\workfile\develop\compiler\compiler\util.h
 
-1542898777 source:e:\workfile\develop\compiler\compiler\util.c
+1543243417 source:e:\workfile\develop\compiler\compiler\util.c
 	"types.h"
 	"error.h"
 	"util.h"
 
-1543139120 source:e:\workfile\develop\compiler\compiler\midtomips.c
+1543294729 source:e:\workfile\develop\compiler\compiler\midtomips.c
 	"types.h"
 	"util.h"
 
 1542894095 e:\workfile\develop\compiler\compiler\midtomips.h
+
+1543295171 source:e:\workfile\develop\compiler\compiler\preprocess.c
+	"preprocess.h"
+	"types.h"
+	"util.h"
+
+1543295109 e:\workfile\develop\compiler\compiler\preprocess.h
 
