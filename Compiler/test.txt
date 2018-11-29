@@ -1,10 +1,25 @@
-int feb(int n){
-    if(n < 2) return (1);
-    else return (feb(n-1)+feb(n-2));
+const int zero = 0,neg = -1,pos = +1;
+const char c = 'c',CC = 'C',Plus = '+',_Plus = '-',Mul = '*',_Mul = '/',n_u_m_0='0';
+int a1var,a2var,arrayintVar[10];
+char c1var,c2var,arraycharVar[10];
+
+int itrue(){
+    return (1);
+}
+char chtrue(){
+    return ('a');
+}
+
+void testExpression(){
+    int i,array[10],result;
+    i=5;
+    array[1] = 10;
+    result = -neg+i/2-i*zero;
+    printf("result",result);
+    result = pos*array[itrue()]*3*c*(i*(pos+pos)+itrue())*result;
+    printf("result",result);
 }
 
 void main(){
-    int a ;
-    a = a + 3*4+5*6*7*8;
-    feb(6); 
+    testExpression();
 }

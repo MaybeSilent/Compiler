@@ -9,6 +9,9 @@ int labelNum;
 
 enum typel expreType; //xpression 返回值类型，用于类型转换判断问题
 
+enum typel termType;
+enum typel factorType;
+
 enum typel retType; //返回语句的返回值类型
 
 int retFlag;
@@ -55,7 +58,7 @@ void constDec(){
                     insymbol();
                 } else if(curSy == CHARCON && (!intFlag)){
                     entertab(id,Const,Char,ichar);
-                    emit(ConstOp,"char",charToString(ichar),id);
+                    emit(ConstOp,"char",intToString((int)ichar),id);
                     insymbol();
                 } else error(3);
             } else error(2);
@@ -151,9 +154,16 @@ void funcInsert(int intFlag){
     /////////////////////////////
     enterblock();    //enterblock
     /////////////////////////////
-    if(intFlag == 1) entertab(id,Function,Int,blockCount);//首先将function插入符号表之中
-    else if(intFlag == 0) entertab(id,Function,Char,blockCount);
-    else if(intFlag == -1) entertab(id,Function,None,blockCount);
+    if(intFlag == 1){
+        retType = Int;
+        entertab(id,Function,Int,blockCount);//首先将function插入符号表之中
+    } else if(intFlag == 0) {
+        retType = Char;
+        entertab(id,Function,Char,blockCount);
+    } else if(intFlag == -1) {
+        retType = None;
+        entertab(id,Function,None,blockCount);
+    }
     //////////////////////////////
     level = level + 1;          //
     display[level] = blockCount;//
@@ -176,7 +186,7 @@ void program(){
     while(curSy == CONSTSY){
         constDec();
         if(curSy != SEMICOLON) error(26);
-        insymbol();
+        else insymbol();
         while(!(curSy == INTSY || curSy == CHARSY || curSy == VOIDSY || curSy == CONSTSY)){
             error(31);
             insymbol();
@@ -284,7 +294,7 @@ void callparm(int pos){
     for(i = 0 ; i <= n ; i++){
         insymbol();
         expression();
-        if(expreType == Char) emit(PushParmOp,"0","0",intToString(charToInt(retexpre)));
+        if(expreType == Char) emit(PushParmOp,"0","0",retexpre);
         else emit(PushParmOp,"0","0",retexpre);
         if(expreType == Int){
             if(params[i] != Int) error(16);
@@ -306,6 +316,8 @@ void factor(){
     //insymbol(); 解析因子之时，可以默认为已经读入相应的内容
     if(grammer) printf("处理到表达式因子\n");
     int constsign = (curSy == INTCON)||(curSy==CHARCON);
+    enum typel typelfactor = Int;
+
     /////常数优化临时变量
     if(curSy == IDENTSY){
         int pos = loc(id);//IDENTSY可能为变量，可能为函数，也可能为数组
@@ -338,13 +350,13 @@ void factor(){
             } else error(14);
         } else error(11);
         //////////////////////////////
-        if(idtabs[pos].type == Char && expreType == None) expreType = Char;
+        if(idtabs[pos].type == Char) typelfactor = Char;
         //////////////////////////////强制类型转换expreType
     } else if(curSy == PLUS || curSy == SUB){
         int sign = 1;
         if(curSy == SUB) sign = -1;
         insymbol(); //读取相应的整数
-        if(curSy != INTCON) {
+        if(curSy == INTCON) {
             inum = inum * sign;
             strcpy(retfactor,intToString(inum));
         } else error(10);
@@ -353,9 +365,9 @@ void factor(){
         strcpy(retfactor,intToString(inum));
     } else if(curSy == CHARCON) {
         factorValue = (int)ichar;
-        strcpy(retfactor,charToString(ichar));
+        strcpy(retfactor,intToString(factorValue));
         ///////////////////////////////
-        if(expreType == None) expreType = Char;
+        typelfactor = Char;
         ///////////////////////////////强制类型转换expreType
     } else if(curSy == LPARENT){
         insymbol();
@@ -366,24 +378,27 @@ void factor(){
         } else error(11);
     } else error(11);
     factorConst = constsign;
+    factorType = typelfactor;
 }
 
 void term(){
     if(grammer) printf("处理到表达式项\n");
     char termarg1[32] = {0},termarg2[32] = {0};
 
+    enum typel typelterm = Int;
     int termsign = 0;
     factor();
     if(factorConst){
         termsign = 1;
         termValue = factorValue;
     }
+    if(factorType == Char) typelterm = Char;
 
     strcpy(retterm,retfactor);
     insymbol();
     while(curSy == MULT || curSy == DIV){
         /////////////////////
-        expreType = Int;//表达式返回类型
+        typelterm = Int;//表达式返回类型
         /////////////////////
         int multFlag = curSy == MULT ? 1 : 0;
         strcpy(termarg1,retterm); // retfactor中始终应为最新的return寄存器值
@@ -406,6 +421,7 @@ void term(){
         insymbol(); //term 预读取了下一位用于判断
     }
     termConst = termsign;
+    termType = typelterm;
 }
 
 
@@ -413,29 +429,32 @@ void expression(){
     char exprearg1[32] = {0},exprereg2[32]={0};
     if(grammer) printf("处理到表达式\n");
 
-    expreType = None;
+    enum typel typelSign = None;
     if(curSy == PLUS || curSy == SUB){ //表达式第一项内容可以为+或-
         /////////////////////
-        expreType = Int;//表达式返回类型
+        typelSign = Int;//表达式返回类型
         /////////////////////
         if(curSy == SUB){
+            insymbol();
             term(); //term 已经预读取了一位进行相应的判断
             emit(MultOp,"-1",retterm,numToReg(tempregNum));
             strcpy(retexpre,numToReg(tempregNum++));
         } //如果为-，则需要进行计算
         else{
+            insymbol();
             term();
             strcpy(retexpre,retterm);
         }
     } else {
         term();
+        if(termType == Char) typelSign = Char;
         strcpy(retexpre,retterm);
     }
     int constsign = termConst;
     int expreValue = termValue;
     while(curSy == PLUS || curSy == SUB){
         /////////////////////
-        expreType = Int;//表达式返回类型
+        typelSign = Int;//表达式返回类型
         /////////////////////
         int addFlag = (curSy == PLUS) ? 1 : 0;
         insymbol();
@@ -457,15 +476,9 @@ void expression(){
 
     }
 
-    if(expreType == None) expreType = Int;
+    if(typelSign == None) typelSign = Int;
+    expreType = typelSign;
 }
-
-
-void synanalysis(){
-    codeCount = 0;
-    tabCount = 0;
-}
-
 //语句 -> 赋值语句/函数调用语句（callparm，传入相应的pos）
 //条件语句 if 开头
 //assign 要进行类型检查
@@ -497,7 +510,9 @@ void assignstate(int pos){ //赋值语句预读入相应的标识符
         expression();
         if(expreType != idtabs[pos].type) error(18); //类型检查语句
         emit(BecomeOp,retexpre,"0",idtabs[pos].name);
-    } else error(17);
+    } else{
+        errorjump(17);
+    }
 
 }
 //生成相应的label，并对label之前的标号位置进行反填
@@ -518,7 +533,7 @@ void judgestate(){
     if(curSy == RPARENT){
         emit(NoequOp,judgereg,"0","0");
     } else if(curSy >= 17 && curSy <= 22){
-        enum ops ComOp = (enum ops)(curSy-5);
+        enum ops ComOp = (enum ops)(curSy-4);
         insymbol();
         expression();
         emit(ComOp,judgereg,retexpre,"0");
@@ -616,8 +631,9 @@ void forstate(){
                                             if(curSy == RPARENT){
                                                 statement();
 
-                                                if(addFlag) emit(AddOp,idtabs[afterpos].name,intToString(step),idtabs[beforepos].name);
-                                                else emit(SubOp,idtabs[afterpos].name,intToString(step),idtabs[beforepos].name);
+                                                if(addFlag) emit(AddOp,idtabs[afterpos].name,intToString(step),numToReg(tempregNum));
+                                                else emit(SubOp,idtabs[afterpos].name,intToString(step),numToReg(tempregNum));
+                                                emit(BecomeOp,numToReg(tempregNum++),"0",idtabs[beforepos].name);
                                                 emit(GotoOp,"0","0",numToLabel(forjudgeLabel));
                                                 genBackLabel(falseforLabel);
                                             } else error(24);
@@ -689,17 +705,18 @@ void writestate(){
 void returnstate(){
 
     if(grammer) printf("处理到返回语句\n");
-    retFlag = 1;
+
     insymbol();
     if(curSy == LPARENT){
+        retFlag = 1;
         insymbol();
         expression();
-        retType = expreType;
+        if(expreType != retType) error(36);
         emit(RetOp,"0","0",retexpre);
         if(curSy != RPARENT) error(29);
         else insymbol();
     } else {
-        emit(RetOp,"0","0","0");
+        emit(RetOp,"0","0","NULL");
     }
 }
 
@@ -718,8 +735,7 @@ void state(){
     } else if(curSy == FORSY){
         forstate();
     } else if(curSy == LBRACE){
-        statement();
-        //insymbol();
+        insymbol();
         while(curSy != RBRACE){
             state();
             //insymbol();
@@ -731,7 +747,7 @@ void state(){
             errorjump(12);
             return ;
         }
-        if(idtabs[pos].kind == Var || idtabs[pos].kind == Array){
+        if(idtabs[pos].kind == Var || idtabs[pos].kind == Array || idtabs[pos].kind == Parm){
             assignstate(pos);
             checkSem();
         } else if(idtabs[pos].kind == Function) {
@@ -741,7 +757,9 @@ void state(){
             emit(CallOp,idtabs[pos].name,"0","0");
             insymbol();
             checkSem();
-        } else error(25);
+        } else{
+            errorjump(25);
+        }
     } else if(curSy == INPUTSY){
         readstate();
         checkSem();
@@ -753,6 +771,7 @@ void state(){
         returnstate();
         checkSem();
     } else if(curSy == SEMICOLON){
+        insymbol();
         //空语句
     } else {
         error(28);

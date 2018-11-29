@@ -41,17 +41,6 @@ typedef struct Tab tab;
 tab idtabs[10240];
 int tabCount;
 
-//！！！c0文法数组仅为一维数组
-//struct Atab {
-//    int arraySize;
-//    int n; //维数
-//    enum typel type;
-//    int sizeList[32];
-//};
-//typedef struct Atab atab;
-//atab arraytabs[1024];
-//int atabCount;
-
 //声明函数时，或者在语句块中遇到{之时，插入相应的block
 struct Btab {
     int last;
@@ -88,16 +77,7 @@ void printstring();
 
 char dataVariable[128][1024];
 int dataCount;
-
-struct mipsCode{
-    char code[64];
-    struct mipsCode* next;
-};
-typedef struct mipsCode* MipsPtr;
-typedef struct mipsCode MipsCode;
-
-MipsPtr data;
-MipsPtr text;
-MipsPtr _main_;
+char resultMips[20480][64];
+int ansCount;
 
 #endif // TYPES_H_INCLUDED

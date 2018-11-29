@@ -12,10 +12,6 @@ int stringToInt(String in){
     return atoi(in);
 }
 
-int charToInt(String in){
-    return in[0];
-}
-
 String intToString(int inum){
     itoa(inum,numstring,10);
     return numstring;
@@ -27,11 +23,6 @@ String getStringCon(int count){
     return strconreg;
 }
 
-String charToString(char ichar){
-    charstring[0] = ichar;
-    charstring[1] = '\0';
-    return charstring;
-}
 
 String numToLabel(int n){
     strcpy(labelreg,"label_");
@@ -39,7 +30,26 @@ String numToLabel(int n){
     return labelreg;
 }
 
+String processString(String instring){
+    char cache[1024];
+    strcpy(cache,"\\");
+    int length = strlen(instring);
+    int i = 0;
+    for(i = 0 ; i < length ; i++){
+        if(instring[i] == '\\'){
+            strcat(cache,instring+i);
+            strcpy(instring+i,cache);
+            strcpy(cache,"\\");
+            length++;
+            i++;
+        }
+    }
+    strcat(instring,"\\n");
+    return instring;
+}
+
 int insertString(String instring){
+    processString(instring);
     int i = 0;
     for(i = 0 ; i < countprint ; i ++){
         if(strcmp(printreg[i],instring) == 0){
@@ -63,7 +73,7 @@ int loc(String id){
         int i = blocktabs[display[j]].last;
         while(i != 0){
             if(strcmp(idtabs[i].name , id) == 0) return i;
-            i --;
+            i = idtabs[i].link;
         }
         j --;
     }
@@ -113,13 +123,6 @@ String numToReg(int n){
     return tempreg;
 }
 
-MipsPtr addNext(MipsPtr inptr , String instring){
-    MipsPtr nextptr = (MipsPtr)malloc(sizeof(MipsCode));
-    memset(nextptr,0,sizeof(MipsCode));
-    inptr->next = nextptr;
-    strcpy(nextptr->code,instring);
-    return nextptr;
-}
 
 
 void printtabs(){
@@ -163,15 +166,15 @@ void printstring(){
     }
 }
 
-void printmips(MipsPtr ptr){
+void printmips(){
     printf("<<<<<<<<<<<<<mips>>>>>>>>>>>>>>\n");
     int i = 0 ;
     for(i = 0 ; i < dataCount ; i++){
         printf("%s\n",dataVariable[i]);
     }
-
-    while(ptr != NULL){
-        printf("%s\n",ptr->code);
-        ptr = ptr->next;
+    i = 0;
+    while(i != ansCount){
+        printf("%s\n",resultMips[i]);
+        i++;
     }
 }

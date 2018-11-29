@@ -20,9 +20,8 @@ void emitLabel(int codepos , int labelnum);
 
 String getStringCon(int count);
 int insertString(String instring);
-
-MipsPtr addNext(MipsPtr inptr , String instring);
-void printmips(MipsPtr ptr);
-
+void printmips();
 void program();
+
+String findbyReg(String in,int flag);
 #endif // UTIL_H_INCLUDED

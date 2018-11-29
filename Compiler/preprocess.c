@@ -1,7 +1,7 @@
 #include "preprocess.h"
 #include "types.h"
 #include "util.h"
-
+/*
 void addVar(int size,String name){
     int count = runtab[runCount].varCount;
     strcpy(runtab[runCount].varName[count],name);
@@ -67,4 +67,6 @@ void find(String name, int index){
         sprintf(findreg,"-%d($fp)",pos+index*4);
     }
 }
+*/
+
 
