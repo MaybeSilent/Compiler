@@ -9,7 +9,11 @@ char localVariable[4096][128];
 int localpos[4096];
 int localCount;
 
-int parmcount = -8;
+char funcname[256][128];
+int funcnum[256];
+int funcCount = 0;
+
+int parmcount = 0;
 
 void printVariable(){
     int i = 0;
@@ -91,11 +95,10 @@ String find(String name,String pos){
 }
 
 void saveToMem(int index){
-    if(Regpool[index].states == 0) return ;
+    if(Regpool[index].states == 0) return;
     else {
         Regpool[index].states = 0;
         sprintf(resultMips[ansCount++],"sw %s %s",regName[index],find(Regpool[index].name,"0"));
-        //printf("%s %s %s \n",Regpool[index].name,regName[index],findreg);
     }
 }
 
@@ -250,7 +253,7 @@ void sentences(){
             sprintf(resultMips[ansCount++],"sw $t9 %s",resultReg);
         }
     } else if(codes[nowCode].op == AddOp || codes[nowCode].op == SubOp || codes[nowCode].op == MultOp || codes[nowCode].op == DivOp){
-        printf("%s %s\n",codes[nowCode].arg1,codes[nowCode].arg2);
+        //printf("%s %s\n",codes[nowCode].arg1,codes[nowCode].arg2);
         getargs(codes[nowCode].arg1,codes[nowCode].arg2);
         //获取参数的形式
         if(codes[nowCode].op == AddOp) sprintf(resultMips[ansCount++],"add %s %s %s",findbyReg(codes[nowCode].result,0),arg1reg,arg2reg);
@@ -264,6 +267,8 @@ void sentences(){
             sprintf(resultMips[ansCount++],"mflo %s",findbyReg(codes[nowCode].result,0));
         }
     } else if(codes[nowCode].op == GetArrayOp){
+        strcpy(arg1reg,findbyReg(codes[nowCode].result,0));
+        strcpy(arg2reg,find(codes[nowCode].arg1,codes[nowCode].arg2));
         //getargs(codes[nowCode].arg1,codes[nowCode].arg2);
         sprintf(resultMips[ansCount++],"lw %s %s",findbyReg(codes[nowCode].result,0),find(codes[nowCode].arg1,codes[nowCode].arg2));
     } else if(codes[nowCode].op == PushParmOp){
@@ -292,18 +297,30 @@ void sentences(){
     } else if(codes[nowCode].op == FalseOp || codes[nowCode].op == TrueOp){
         sprintf(resultMips[ansCount++],"beq $t8 %d %s",codes[nowCode].op == TrueOp,codes[nowCode].result);
     } else if(codes[nowCode].op == CallOp){
-        parmcount = -8;
+        //检索函数参数内容//
+        int index = 0;
+        for(index = 0 ; index < funcCount ; index++){
+            if(strcmp(funcname[index],codes[nowCode].arg1) == 0) break;
+        }
+        int count = funcnum[index];
+        int offset = 0;
+        offset = ( count * (-4)) - parmcount;
+        if(offset != 0) sprintf(resultMips[ansCount++],"subi $sp $sp %d",offset);
         saveall();
         /////////////////////////////////
-        sprintf(resultMips[ansCount++],"sw $fp 0($sp)");
+        sprintf(resultMips[ansCount++],"sw $fp %d($sp)",parmcount);
         sprintf(resultMips[ansCount++],"move $fp $sp");
-        sprintf(resultMips[ansCount++],"sw $ra -4($fp)");
+        sprintf(resultMips[ansCount++],"sw $ra %d($fp)",parmcount - 4);
         /////////////////////////////////
         sprintf(resultMips[ansCount++],"jal %s",codes[nowCode].arg1);
         sprintf(resultMips[ansCount++],"move $sp $fp");
-        sprintf(resultMips[ansCount++],"lw $fp 0($sp)");
-        sprintf(resultMips[ansCount++],"lw $ra -4($sp)");
-        if(strcmp(codes[nowCode].result,"0")!=0) sprintf(resultMips[ansCount++],"move %s $v0",findbyReg(codes[nowCode].result,0));
+        sprintf(resultMips[ansCount++],"lw $fp %d($sp)",parmcount);
+        sprintf(resultMips[ansCount++],"lw $ra %d($sp)",parmcount - 4);
+        if(offset != 0){
+            sprintf(resultMips[ansCount++],"addi $sp $sp %d",offset);
+            parmcount = parmcount + count * 4;
+        } else parmcount = 0;
+        if(strcmp(codes[nowCode].result,"0") != 0) sprintf(resultMips[ansCount++],"move %s $v0",findbyReg(codes[nowCode].result,0));
     } else if(codes[nowCode].op == ScanfOp){
         int scanftype = strcmp(codes[nowCode].arg1,"int") == 0 ? 5 : 12 ;
         sprintf(resultMips[ansCount++],"li $v0 %d",scanftype);
@@ -324,6 +341,10 @@ void sentences(){
         }
         sprintf(resultMips[ansCount++],"li $v0 %d",printftype);
         sprintf(resultMips[ansCount++],"syscall");
+        sprintf(resultMips[ansCount++],"li $a0 \'\\n\'");
+        sprintf(resultMips[ansCount++],"li $v0 11");
+        sprintf(resultMips[ansCount++],"syscall");
+
     }else if(codes[nowCode].op == RetOp){
         if(strcmp(codes[nowCode].result,"NULL") !=0 ){
             char outreg[32];
@@ -342,11 +363,21 @@ void sentences(){
 void funcMidCodes(){
     //函数跳转保存栈，参数声明变量
     localCount = 0;
-    localpos[0] = 8;
+    localpos[0] = 0;
+    int func_count = 0;
     while(codes[nowCode].op == ParmOp){
         addVariable(4,0);
         nowCode ++;
+        func_count ++;
     }
+    funcnum[funcCount++] = func_count;
+    ///////////////////////////////插入fp与ra区域
+    strcpy(localVariable[localCount++],"$fp");
+    localpos[localCount] = localpos[localCount-1]+4;
+    strcpy(localVariable[localCount++],"$ra");
+    localpos[localCount] = localpos[localCount-1]+4;
+    ////////////////////////////////插入fp与ra区域
+
     declarMidCodes(0); //局部声明变量
     while(codes[nowCode].op != FunctionOp && nowCode < codeCount){
         sentences();
@@ -361,8 +392,8 @@ void fillText(){
     strcpy(resultMips[ansCount++],"move $gp $sp");
     declarMidCodes(1); //add global value
     strcpy(resultMips[ansCount++],"j main");
-
     while(codes[nowCode].op == FunctionOp){
+        strcpy(funcname[funcCount],codes[nowCode].result);//将函数名加入到函数表
         clearall();
         sprintf(resultMips[ansCount++],"%s:",codes[nowCode++].result);
         funcMidCodes();

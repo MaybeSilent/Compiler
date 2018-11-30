@@ -44,7 +44,6 @@ String processString(String instring){
             i++;
         }
     }
-    strcat(instring,"\\n");
     return instring;
 }
 

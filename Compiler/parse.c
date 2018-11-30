@@ -437,8 +437,13 @@ void expression(){
         if(curSy == SUB){
             insymbol();
             term(); //term 已经预读取了一位进行相应的判断
-            emit(MultOp,"-1",retterm,numToReg(tempregNum));
-            strcpy(retexpre,numToReg(tempregNum++));
+            if(termConst){
+                    termValue = termValue*-1;
+                    strcpy(retexpre,intToString(termValue));
+            } else {
+                emit(MultOp,"-1",retterm,numToReg(tempregNum));
+                strcpy(retexpre,numToReg(tempregNum++));
+            }
         } //如果为-，则需要进行计算
         else{
             insymbol();
@@ -503,7 +508,7 @@ void assignstate(int pos){ //赋值语句预读入相应的标识符
 
             emit(BecomeOp,retexpre,indexreg,idtabs[pos].name); //分号丢到外面检查
         } else error(13);
-    } else if(idtabs[pos].kind == Var) {
+    } else if(idtabs[pos].kind == Var || idtabs[pos].kind == Parm) {
         insymbol();
         if(curSy != BECOMESY) error(17);
         else insymbol();
