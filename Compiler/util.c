@@ -177,3 +177,22 @@ void printmips(){
         i++;
     }
 }
+
+void printToFILE(){
+    int er = getErrorNum();
+    if(er == 0){
+        printf("结果位于result.asm中!");
+        FILE *f = fopen("result.asm","w");
+        int i = 0 ;
+        for(i = 0 ; i < dataCount ; i++){
+            fprintf(f,"%s\n",dataVariable[i]);
+        }
+        i = 0;
+        while(i != ansCount){
+            fprintf(f,"%s\n",resultMips[i]);
+            i++;
+        }
+    } else {
+        printf("请先改正错误再进行编译！");
+    }
+}

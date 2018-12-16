@@ -7,11 +7,12 @@
 void testParse(){
     setup();
     program();
-    printtabs();
-    printcodes();
-    printstring();
+    //printtabs();
+    //printcodes();
+    //printstring();
     midToMips();
-    printmips();
+    //printmips();
+    printToFILE();
 }
 
 void testSymbol(){

@@ -1,0 +1,117 @@
+开始两个参数为gcd
+45
+9
+输出为
+9
+输入0，0退出gcd循环
+
+之后为测试相应的斐波那契数列
+10
+输出为55
+输入0退出循环
+
+接下来为相应的线段树测试
+输入线段树数目n
+输入n个数
+进行查询
+
+之后相应的输出可以为
+Please input the 
+4
+-th number: 
+4
+The numbers you just inputed are:
+The 
+1
+-th: 
+1
+The 
+2
+-th: 
+2
+The 
+3
+-th: 
+3
+The 
+4
+-th: 
+4
+Building segment tree...
+The tree is succesfully built! Now it can respond to your query requests.
+Please input 3 numbers, l, r, and type, type=-1 means exit:
+1
+2
+0
+Your query result is 
+2
+Please input 3 numbers, l, r, and type, type=-1 means exit:
+1
+2
+1
+Your query result is 
+1
+Please input 3 numbers, l, r, and type, type=-1 means exit:
+1
+2
+2
+Your query result is 
+3
+Please input 3 numbers, l, r, and type, type=-1 means exit:
+0
+0
+-1
+Echo testing...
+aa
+99
+05
+-7
+0
+-1
+-1
+1
+1
+-20
+19
+26
+0
+8
+17
+history_process
+1
+s
+2
+.
+7
+1
+8
+2
+8
+1
+8
+2
+8
+Quick sort test:
+Please input the number of integers:
+4
+Please input the 
+1
+-th number:
+1
+Please input the 
+2
+-th number:
+2
+Please input the 
+3
+-th number:
+3
+Please input the 
+4
+-th number:
+4
+The result after sorting is:
+1
+2
+3
+4

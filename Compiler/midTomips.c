@@ -305,19 +305,20 @@ void sentences(){
         int count = funcnum[index];
         int offset = 0;
         offset = ( count * (-4)) - parmcount;
-        if(offset != 0) sprintf(resultMips[ansCount++],"subi $sp $sp %d",offset);
         saveall();
         /////////////////////////////////
         sprintf(resultMips[ansCount++],"sw $fp %d($sp)",parmcount);
-        sprintf(resultMips[ansCount++],"move $fp $sp");
-        sprintf(resultMips[ansCount++],"sw $ra %d($fp)",parmcount - 4);
+        sprintf(resultMips[ansCount++],"sw $ra %d($sp)",parmcount - 4);
         /////////////////////////////////
+        if(offset != 0) sprintf(resultMips[ansCount++],"subi $sp $sp %d",offset);
+        sprintf(resultMips[ansCount++],"move $fp $sp");
         sprintf(resultMips[ansCount++],"jal %s",codes[nowCode].arg1);
         sprintf(resultMips[ansCount++],"move $sp $fp");
+        if(offset != 0) sprintf(resultMips[ansCount++],"addi $sp $sp %d",offset);
+        //////////////////////////////////
         sprintf(resultMips[ansCount++],"lw $fp %d($sp)",parmcount);
         sprintf(resultMips[ansCount++],"lw $ra %d($sp)",parmcount - 4);
         if(offset != 0){
-            sprintf(resultMips[ansCount++],"addi $sp $sp %d",offset);
             parmcount = parmcount + count * 4;
         } else parmcount = 0;
         if(strcmp(codes[nowCode].result,"0") != 0) sprintf(resultMips[ansCount++],"move %s $v0",findbyReg(codes[nowCode].result,0));

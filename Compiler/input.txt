@@ -15,13 +15,11 @@ void compareTwo(){
     if(var_a >= var_b) printf("var_a >= var_b");
     if(var_a != var_b) printf("var_a != var_b");
     if(var_a == var_b) printf("var_a == var_b");
-    printf("\n");
 }
 
 void testIf(){
     if(var_a) printf("var_a");
     else printf("not var_a");
-    printf("\n");
 }
 
 int getMult(int number){
@@ -37,25 +35,17 @@ void test_do_while(){
     do{
         var_count = var_count + 1;
         printf(var_count);
-        printf("\n");
     } while(var_count < 10);;;;;;
 }
 
 void test_expression(int param_one , int param_two){
     printf(-param_one*param_two);
-    printf("\n");
     printf(+param_one*param_two);
-    printf("\n");
     printf(+param_one/param_two);
-    printf("\n");
     printf(param_one*param_one + param_two*param_two);
-    printf("\n");
     printf(param_one*2 + 100);
-    printf("\n");
     printf(param_one + 'a');
-    printf("\n");
     printf(param_two + 'b');
-    printf("\n");
 }
 
 void test_for(){
@@ -65,15 +55,12 @@ void test_for(){
     var_end = 10;
     for(var_value = var_start; var_value > var_end ; var_value = var_value - 2){
         printf(var_value);
-        printf("\n");
     }
     for(var_value = var_start; var_value < var_end ; var_value = var_value + 1){
         printf(var_value);
-        printf("\n");
     }
     for(var_value = var_start; var_value < var_end ; var_value = var_value + 2){
         printf(var_value);
-        printf("\n");
     }
 }
 
@@ -99,7 +86,6 @@ void main(){
    
     var_a = getMult(3);
     printf(var_a);
-    printf("\n");
 
     var_a = 1;
     testIf();

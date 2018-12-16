@@ -24,4 +24,5 @@ void printmips();
 void program();
 
 String findbyReg(String in,int flag);
+void printToFILE();
 #endif // UTIL_H_INCLUDED
