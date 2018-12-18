@@ -1,0 +1,9 @@
+char a,b;
+
+void main(){
+    a = 'c';
+    b = 'd';
+    if(a < b){
+	printf("emmmmmm");
+    }
+}

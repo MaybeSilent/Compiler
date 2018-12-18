@@ -336,6 +336,7 @@ void factor(){
             if(curSy == LBRACKET){
                 insymbol();
                 expression();
+                //数组越界检查报错
                 emit(GetArrayOp,idtabs[pos].name,retexpre,numToReg(tempregNum));//此处要进行相应的处理
                 strcpy(retfactor,numToReg(tempregNum++));
             }else error(13);
@@ -498,7 +499,7 @@ void assignstate(int pos){ //赋值语句预读入相应的标识符
             insymbol();
             expression(); //预读取了一位
             strcpy(indexreg,retexpre);
-
+            //数组越界报错
             if(curSy != RBRACKET) error(13);
             else insymbol();
             if(curSy != BECOMESY) error(17);
@@ -534,7 +535,7 @@ void judgestate(){
     insymbol();
     expression();
     strcpy(judgereg,retexpre);
-
+    //条件赋值语句类型不匹配判断
     if(curSy == RPARENT){
         emit(NoequOp,judgereg,"0","0");
     } else if(curSy >= 17 && curSy <= 22){
@@ -602,6 +603,7 @@ void forstate(){
             if(curSy == BECOMESY){
                 int pos = loc(id);
                 if(pos == -1){
+                    error(12);
                     error(12);
                     return ;
                 }
@@ -721,6 +723,7 @@ void returnstate(){
         if(curSy != RPARENT) error(29);
         else insymbol();
     } else {
+        if(expreType != None) error(36); //return 语句返回值类型报错
         emit(RetOp,"0","0","NULL");
     }
 }

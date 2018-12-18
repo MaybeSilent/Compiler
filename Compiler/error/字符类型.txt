@@ -1,0 +1,8 @@
+char a ;
+
+void main(){
+    a = 'c';
+    if(0){
+	printf(a);
+    }
+}
