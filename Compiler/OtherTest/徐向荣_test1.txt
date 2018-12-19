@@ -1,0 +1,24 @@
+int x;
+int y;
+int add() {
+    x = x+1;
+    return (x+y);
+}
+int add1(){
+	y=y+1;
+	return(add()+1+x);
+}
+int sum(int a, int b,int c,int d,int e,int f,int g,int h,int i) {
+    return (a+b+c+d+e+f+g+h+i);
+}
+
+int paratest(int a,int b,int c){
+	return(a+b*c);
+}
+
+void main() {
+    x = 1;
+	y=1;
+    printf(sum(x, add(),x,add1(),add1(),y,add1(),x,add()));
+	printf(paratest(1,paratest(2,3,4),5));
+}

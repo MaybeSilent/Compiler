@@ -195,12 +195,14 @@ void build(int l,int r,int pos) {
 
 
 void echo() {
+    int y;
     char x;
     int i;
     i = 0;
-    do{
+    do{ 
         scanf(x);
-        if(x=='0') return;
+        y = (x);
+        if(y == 48) return;
         printf(x);
         printf(x+2);
         i = i + 1;

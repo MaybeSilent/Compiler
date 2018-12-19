@@ -1,0 +1,33 @@
+const int con=42;
+int b[100];
+char c,d,e[100];
+int s;
+
+int testfac(int n){
+	if(n==0){
+		return(1);
+	}else{
+		return(testfac(n-1)*n);
+	}
+}
+
+void test(){
+	const int ca=1,cb=2;
+	int inta,intb;
+	int a[100];
+	int c[10];
+	a[0]=4;
+	a[1]=0;
+	a[6]=3;
+	a[testfac(a[testfac(0)])]=testfac(a[testfac(a[testfac(a[6])])]);
+	printf(a[9-2*4]);
+}
+
+
+void main(){
+	int a[100];
+	s=7;
+	a[testfac(1+2+6*7-con)]=100;
+	test();
+	printf(a[42/s]);
+}

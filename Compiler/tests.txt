@@ -1,0 +1,6 @@
+int b[100];
+char c,d,e[100];
+
+void main(){
+
+}

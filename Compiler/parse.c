@@ -227,6 +227,7 @@ void program(){
             } else error(32);
         } else if(curSy == MAINSY){
             emit(Function,"0","0","main");
+            retType = None; //230 main函数返回值报错问题
             enterblock();
             //////////////////////////////
             level = level + 1;          //
@@ -337,6 +338,7 @@ void factor(){
                 insymbol();
                 expression();
                 //数组越界检查报错
+                if(atoi(retexpre) >= idtabs[pos].value) error(37);
                 emit(GetArrayOp,idtabs[pos].name,retexpre,numToReg(tempregNum));//此处要进行相应的处理
                 strcpy(retfactor,numToReg(tempregNum++));
             }else error(13);
@@ -500,6 +502,7 @@ void assignstate(int pos){ //赋值语句预读入相应的标识符
             expression(); //预读取了一位
             strcpy(indexreg,retexpre);
             //数组越界报错
+            if(atoi(retexpre) >= idtabs[pos].value) error(37);
             if(curSy != RBRACKET) error(13);
             else insymbol();
             if(curSy != BECOMESY) error(17);
@@ -535,13 +538,18 @@ void judgestate(){
     insymbol();
     expression();
     strcpy(judgereg,retexpre);
-    //条件赋值语句类型不匹配判断
+
+    if(expreType == Char) error(25);//条件赋值语句类型不匹配判断
+
     if(curSy == RPARENT){
         emit(NoequOp,judgereg,"0","0");
     } else if(curSy >= 17 && curSy <= 22){
         enum ops ComOp = (enum ops)(curSy-4);
         insymbol();
         expression();
+
+        if(expreType == Char) error(25); //条件赋值语句类型不匹配判断
+
         emit(ComOp,judgereg,retexpre,"0");
         if(!(curSy == RPARENT || curSy == SEMICOLON)) error(19);
     } else error(19);
@@ -723,7 +731,7 @@ void returnstate(){
         if(curSy != RPARENT) error(29);
         else insymbol();
     } else {
-        if(expreType != None) error(36); //return 语句返回值类型报错
+        if(retType != None) error(25);//return 语句返回值类型报错
         emit(RetOp,"0","0","NULL");
     }
 }

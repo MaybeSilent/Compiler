@@ -1,0 +1,12 @@
+int a;
+char b;
+
+void main(){
+    a = b + 1;
+
+
+   
+
+
+    a = b;    
+}

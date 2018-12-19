@@ -1,0 +1,74 @@
+输入：
+1
+1
+aa
+输出：
+scanf two int 
+1
+1
+ A(-+11)= 
+-11
+ calc A =
+-11
+input1==input2 
+get_gcd a and A= 
+1
+aa four param cal=
+180
+ fourparam return= 
+a
+\n\n\n const A_const_char= 
+A
+\\n\\n\\n a_var_char_arr[4]= 
+a
+
+输入：
+
+64
+88
+Aa
+输出：
+
+scanf two int 
+64
+88
+ A(-+11)= 
+-11
+ calc A =
+-11
+input1<input2 
+get_gcd a and A= 
+8
+Aa four param cal=
+36772
+ fourparam return= 
+a
+\n\n\n const A_const_char= 
+A
+\\n\\n\\n a_var_char_arr[4]= 
+a
+
+输入：
+184
+446
+zD
+输出:
+scanf two int 
+184
+446
+ A(-+11)= 
+-11
+ calc A =
+-11
+input1<input2 
+get_gcd a and A= 
+2
+zD four param cal=
+678678
+ fourparam return= 
+D
+\n\n\n const A_const_char= 
+A
+\\n\\n\\n a_var_char_arr[4]= 
+a
+

@@ -1,0 +1,6 @@
+输入：
+5 4 和任意两个字符
+
+输出：
+hello_word!
+hello world 597ac0123403bacedf6720554028

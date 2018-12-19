@@ -67,8 +67,8 @@ void foo_trans(){
     
     scanf (input);
     target = input + 0;
-    if (input >= 'A'){
-        if (input <= 'Z')
+    if ((input) >= ('A')){
+        if ((input) <= ('Z'))
             target = input - 'A' + 'a';
         else
             ;
@@ -133,11 +133,11 @@ void main_mirror(){
 void main(){
     char op;
     scanf(op);    
-    if(op=='e')printf(foo_expr());
-    else if(op=='r') foo_recursion();
-    else if(op=='n') do_nothing();
-    else if(op=='v') value();
-    else if(op=='t') foo_trans();
+    if((op)==('e'))printf(foo_expr());
+    else if((op)==('r')) foo_recursion();
+    else if((op)==('n')) do_nothing();
+    else if((op)==('v')) value();
+    else if((op)==('t')) foo_trans();
     else printf("Please input e/r/n/v/t instead of ",op);
     
     return;
