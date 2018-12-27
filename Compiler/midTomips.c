@@ -82,11 +82,11 @@ String find(String name,String pos){
         }
         sprintf(resultMips[ansCount++],"sll $t8 %s 2",ans);
         if(globalFlag){
-            sprintf(resultMips[ansCount++],"sub $t8 $gp $t8");
+            sprintf(resultMips[ansCount++],"subu $t8 $gp $t8");
             sprintf(findreg,"-%d($t8)",globalpos[nameindex]);
         }
         else{
-            sprintf(resultMips[ansCount++],"sub $t8 $fp $t8");
+            sprintf(resultMips[ansCount++],"subu $t8 $fp $t8");
             sprintf(findreg,"-%d($t8)",localpos[nameindex]);
         }
 
@@ -208,8 +208,8 @@ void declarMidCodes(int globalFlag){
         nowCode++;
     }
     RegforTemp();
-    if(globalFlag) sprintf(resultMips[ansCount++],"subi $sp $sp %d",globalpos[globalCount]);
-    else sprintf(resultMips[ansCount++],"subi $sp $sp %d",localpos[localCount]);
+    if(globalFlag) sprintf(resultMips[ansCount++],"subiu $sp $sp %d",globalpos[globalCount]);
+    else sprintf(resultMips[ansCount++],"subiu $sp $sp %d",localpos[localCount]);
     strcpy(resultMips[ansCount++],"#~~~变量声明部分结束~~~~");
     //printVariable();
 }
@@ -256,8 +256,8 @@ void sentences(){
         //printf("%s %s\n",codes[nowCode].arg1,codes[nowCode].arg2);
         getargs(codes[nowCode].arg1,codes[nowCode].arg2);
         //获取参数的形式
-        if(codes[nowCode].op == AddOp) sprintf(resultMips[ansCount++],"add %s %s %s",findbyReg(codes[nowCode].result,0),arg1reg,arg2reg);
-        else if(codes[nowCode].op == SubOp) sprintf(resultMips[ansCount++],"sub %s %s %s",findbyReg(codes[nowCode].result,0),arg1reg,arg2reg);
+        if(codes[nowCode].op == AddOp) sprintf(resultMips[ansCount++],"addu %s %s %s",findbyReg(codes[nowCode].result,0),arg1reg,arg2reg);
+        else if(codes[nowCode].op == SubOp) sprintf(resultMips[ansCount++],"subu %s %s %s",findbyReg(codes[nowCode].result,0),arg1reg,arg2reg);
         else if(codes[nowCode].op == MultOp) {
             sprintf(resultMips[ansCount++],"mult %s %s",arg1reg,arg2reg);
             sprintf(resultMips[ansCount++],"mflo %s",findbyReg(codes[nowCode].result,0));
@@ -310,11 +310,11 @@ void sentences(){
         sprintf(resultMips[ansCount++],"sw $fp %d($sp)",parmcount);
         sprintf(resultMips[ansCount++],"sw $ra %d($sp)",parmcount - 4);
         /////////////////////////////////
-        if(offset != 0) sprintf(resultMips[ansCount++],"subi $sp $sp %d",offset);
+        if(offset != 0) sprintf(resultMips[ansCount++],"subiu $sp $sp %d",offset);
         sprintf(resultMips[ansCount++],"move $fp $sp");
         sprintf(resultMips[ansCount++],"jal %s",codes[nowCode].arg1);
         sprintf(resultMips[ansCount++],"move $sp $fp");
-        if(offset != 0) sprintf(resultMips[ansCount++],"addi $sp $sp %d",offset);
+        if(offset != 0) sprintf(resultMips[ansCount++],"addiu $sp $sp %d",offset);
         //////////////////////////////////
         sprintf(resultMips[ansCount++],"lw $fp %d($sp)",parmcount);
         sprintf(resultMips[ansCount++],"lw $ra %d($sp)",parmcount - 4);

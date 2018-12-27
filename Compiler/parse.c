@@ -541,7 +541,7 @@ void judgestate(){
 
     if(expreType == Char) error(25);//条件赋值语句类型不匹配判断
 
-    if(curSy == RPARENT){
+    if(curSy == RPARENT || curSy == SEMICOLON){
         emit(NoequOp,judgereg,"0","0");
     } else if(curSy >= 17 && curSy <= 22){
         enum ops ComOp = (enum ops)(curSy-4);
