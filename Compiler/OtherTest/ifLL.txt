@@ -1,0 +1,24 @@
+int i;
+
+int first(){
+    i = 1;
+    return (0);
+}
+
+int second(){
+    i = 2;
+    return (2);
+}
+
+void main(){
+    i = 0;
+    if(i == first()){
+        printf("ENTERED AT FIRST");
+    }
+    
+    if(i == second()){
+ 	printf("ENTERED AT SECOND");
+    }
+    
+    return ;    
+}

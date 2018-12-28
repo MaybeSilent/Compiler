@@ -3,7 +3,7 @@
 	"test.h"
 	"parse.h"
 
-1545230274 source:e:\workfile\develop\compiler\compiler\parse.c
+1545968616 source:e:\workfile\develop\compiler\compiler\parse.c
 	"symbol.h"
 	"types.h"
 	"parse.h"
@@ -23,7 +23,7 @@
 	"parse.h"
 	"symbol.h"
 
-1545056425 source:e:\workfile\develop\compiler\compiler\error.c
+1545967888 source:e:\workfile\develop\compiler\compiler\error.c
 	"types.h"
 	"symbol.h"
 
@@ -40,7 +40,7 @@
 	"types.h"
 	"symbol.h"
 
-1545477654 source:e:\workfile\develop\compiler\compiler\test.c
+1545967308 source:e:\workfile\develop\compiler\compiler\test.c
 	"types.h"
 	"parse.h"
 	"symbol.h"

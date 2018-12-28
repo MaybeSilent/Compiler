@@ -7,11 +7,11 @@
 void testParse(){
     setup();
     program();
-    //printtabs();
-    //printcodes();
+    printtabs();
+    printcodes();
     //printstring();
     midToMips();
-    //printmips();
+    printmips();
     printToFILE();
 }
 

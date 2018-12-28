@@ -539,6 +539,25 @@ void judgestate(){
     expression();
     strcpy(judgereg,retexpre);
 
+    //if中需要从左到右进行计算，对于全局变量需要开相应的寄存器进行存储
+    if(strcmp(id,"if") != 0){
+        int j = level;
+        int i = blocktabs[display[j]].last;
+        while(i != 0){
+            if(strcmp(idtabs[i].name , id) == 0) break;
+            i = idtabs[i].link;
+        }
+        if( i == 0 ){
+            int pos = loc(id);
+            if(pos == -1) error(38);
+            if(idtabs[pos].kind == Var){
+                emit(AddOp,idtabs[pos].name,"0",numToReg(tempregNum));
+                strcpy(judgereg,numToReg(tempregNum++));
+            }
+        }
+    }
+    //if全局计算bug更正
+
     if(expreType == Char) error(25);//条件赋值语句类型不匹配判断
 
     if(curSy == RPARENT || curSy == SEMICOLON){
