@@ -150,7 +150,7 @@ void printcodes(){
     printf("<<<<<<<<<<<midcodes>>>>>>>>>>>>\n");
     String opstring[] = {"const","var","array","function","param","push","call","getArray","*","/","+","-",
                         "=","<","<=","==","!=",">",">=",
-                        "falsegoto","truegoto","goto","label","scanf","printf","ret","main"};
+                        "falsegoto","truegoto","goto","label","scanf","printf","ret","NULL"};
     printf("%15s %15s %15s %15s\n","opeartion","arg1","arg2","result");
     int i = 0 ;
     for( ; i <  codeCount ; i++){
@@ -176,7 +176,7 @@ void printcodesOfBasic(){
         for(j = 0 ; j < opblock[i].nextCount ; j++){
             printf("%d ",opblock[i].next[j]);
         }
-        printf("\n");
+        printf("\n\n");
     }
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<<loops>>>>>>>>>>>>>>>>>>>>>>>>>\n");

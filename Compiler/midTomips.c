@@ -1,6 +1,7 @@
 #include "types.h"
 #include "util.h"
 #include "optimization.h"
+#include "midTomips.h"
 
 int nowCode;
 
@@ -16,6 +17,10 @@ int funcnum[256];
 int funcCount = 0;
 
 int parmcount = 0;
+
+int loopNow = 0;
+int addNextLabel = 0;
+int IsInLoop = 0;
 
 void printVariable(){
     int i = 0;
@@ -43,7 +48,59 @@ struct regState{
 String regName[] = {"$t0","$t1","$t2","$t3","$t4","$t5","$t6","$t7"};
 struct regState Regpool[8];
 
+String optimizReg[] = {"$s0","$s1","$s2","$s3","$s4","$s5","$s6","$s7"};
+
 int rollIndex = 0;
+
+void writeInSreg(){
+    //循环开始之前进行寄存器分配
+    if(OPTIMIZE){
+        //printf("loopNow: %d loopCount: %d nowCode: %d  opblock[loopBlo[loopNow].start].start: %d\n",loopNow,loopCount,nowCode,opblock[loopBlo[loopNow].start].start);
+        if(loopNow < loopCount && nowCode == opblock[loopBlo[loopNow].start].start){
+            printf("开始优化循环部分.....\n");
+            int j = 0;
+            for(j = 0 ; j < loopBlo[loopNow].regNum ; j++){
+                sprintf(resultMips[ansCount++],"lw $s%d %s",j,find(loopBlo[loopNow].regs[j],"0"));
+            }
+            IsInLoop = 1;
+        }
+    }
+}
+
+void writeOutSreg(){
+    //循环开始之后进行寄存器的写回
+    if(OPTIMIZE){
+        if(addNextLabel){
+            int j = 0;
+            for(j = 0 ; j < loopBlo[loopNow].regNum ; j++){
+                sprintf(resultMips[ansCount++],"sw $s%d %s",j,find(loopBlo[loopNow].regs[j],"0"));
+            }
+            addNextLabel = 0;
+            IsInLoop = 0;
+            loopNow++;
+        }
+        if(loopNow < loopCount && nowCode == opblock[loopBlo[loopNow].ends].finish){
+            if(codes[nowCode].op == GotoOp){
+                addNextLabel = 1;
+                return ;
+            }
+            int j = 0 ;
+            for(j = 0 ; j < loopBlo[loopNow].regNum ; j++){
+                sprintf(resultMips[ansCount++],"sw $s%d %s",j,find(loopBlo[loopNow].regs[j],"0"));
+            }
+            loopNow ++;
+            IsInLoop = 0;
+        }
+    }
+}
+
+int IsInS(String in){
+    int j = 0;
+    for(j = 0 ; j < loopBlo[loopNow].regNum ; j++){
+        if(strcmp(loopBlo[loopNow].regs[j],in) == 0) return j;
+    }
+    return -1;
+}
 
 String find(String name,String pos){
     int i = 0;
@@ -77,7 +134,7 @@ String find(String name,String pos){
         else sprintf(findreg,"-%d($fp)",localpos[nameindex]+index*4);
     } else {
         String ans;
-        if(pos[0] == '$') ans = findbyReg(pos,1);
+        if(pos[0] == '$' || (OPTIMIZE && IsInLoop && (IsInS(pos) != -1))) ans = findbyReg(pos,1);
         else{
             sprintf(resultMips[ansCount++],"lw $t8 %s",find(pos,"0"));
             ans = "$t8";
@@ -121,6 +178,14 @@ String getReg(String in){
 }
 
 String findbyReg(String in,int flag){ //寄存器是否需要lw
+    if(OPTIMIZE && IsInLoop){
+        int j;
+        for(j = 0 ; j < loopBlo[loopNow].regNum ; j++){
+            if(strcmp(loopBlo[loopNow].regs[j],in) == 0){
+                return optimizReg[j];
+            }
+        }
+    }
     int i = 0;
     for(i = 0 ; i < 8 ; i++){
         //printf("%s %s %d\n",Regpool[i].name,in,Regpool[i].states);
@@ -224,28 +289,57 @@ int judgekind(String in,String reg){
         sprintf(resultMips[ansCount++],"li %s %s",reg,in);
         return 1;
     } else{
+        if(OPTIMIZE && IsInLoop && (IsInS(in) != -1)) return 0;
         sprintf(resultMips[ansCount++],"lw %s %s",reg,find(in,"0"));
         return -1;
     }
 }
 
 void getargs(String arg1 , String arg2){
-    int kind = judgekind(arg1,"$t8");
-    if(kind == 0){
-        strcpy(arg1reg,findbyReg(arg1,1));
+    if(OPTIMIZE && IsInLoop && (IsInS(arg1) != -1)){
+        int indexArg1 = IsInS(arg1);
+        sprintf(arg1reg,"$s%d",indexArg1);
+    } else {
+        int kind = judgekind(arg1,"$t8");
+        if(kind == 0){
+            strcpy(arg1reg,findbyReg(arg1,1));
+        }
+        else {
+            strcpy(arg1reg,"$t8");
+        }
     }
-    else {
-        strcpy(arg1reg,"$t8");
-    }
-    kind = judgekind(arg2,"$t9");
-    if(kind == 0) strcpy(arg2reg,findbyReg(arg2,1));
-    else {
-        strcpy(arg2reg,"$t9");
+    if(OPTIMIZE && IsInLoop && (IsInS(arg2) != -1)){
+        int indexArg2 = IsInS(arg2);
+        sprintf(arg2reg,"$s%d",indexArg2);
+    } else {
+        int kind = judgekind(arg2,"$t9");
+        if(kind == 0) strcpy(arg2reg,findbyReg(arg2,1));
+        else {
+            strcpy(arg2reg,"$t9");
+        }
     }
 }
 
 void sentences(){
+    //优化部分在循环处需要分配相应的s系列寄存器
+    writeInSreg();
     if(codes[nowCode].op == BecomeOp){
+        //////////////优化部分对赋值语句的更改
+        if(OPTIMIZE && IsInLoop && strcmp(codes[nowCode].arg2,"0") == 0){
+            int indexResult = IsInS(codes[nowCode].result);
+            int indexArg = IsInS(codes[nowCode].arg1);
+            if(indexResult != -1){
+                if(indexArg != -1) sprintf(resultMips[ansCount++],"move $s%d $s%d",indexResult,indexArg);
+                else {
+                    int kind = judgekind(codes[nowCode].arg1,"$t9");
+                    if(kind == 0) sprintf(resultMips[ansCount++],"move $s%d %s",indexResult,findbyReg(codes[nowCode].arg1,1));
+                    else sprintf(resultMips[ansCount++],"move $s%d $t9",indexResult);
+                }
+                nowCode++;
+                return ;
+            }
+        }
+        ///////////////优化部分对于赋值语句的更改
         char resultReg[32];
         strcpy(resultReg,find(codes[nowCode].result,codes[nowCode].arg2));
         int kind = judgekind(codes[nowCode].arg1,"$t9");
@@ -272,7 +366,7 @@ void sentences(){
         strcpy(arg1reg,findbyReg(codes[nowCode].result,0));
         strcpy(arg2reg,find(codes[nowCode].arg1,codes[nowCode].arg2));
         //getargs(codes[nowCode].arg1,codes[nowCode].arg2);
-        sprintf(resultMips[ansCount++],"lw %s %s",findbyReg(codes[nowCode].result,0),find(codes[nowCode].arg1,codes[nowCode].arg2));
+        sprintf(resultMips[ansCount++],"lw %s %s",arg1reg,arg2reg);
     } else if(codes[nowCode].op == PushParmOp){
         char pushreg[32];
         while(codes[nowCode].op == PushParmOp){
@@ -288,6 +382,9 @@ void sentences(){
         nowCode --;
     } else if(codes[nowCode].op == LabelOp){
         sprintf(resultMips[ansCount++],"%s:",codes[nowCode].result);
+        ////////////////////////////////
+        writeOutSreg(); //goto语句下一个label写回
+        ////////////////////////////////
     } else if(codes[nowCode].op >= 13 && codes[nowCode].op <= 18){
         //">=", "sge", ">", "sgt", "<=", "sle", "<", "slt", "==", "seq", "!=", "sne"
         //LessOp,LessequOp,EquOp,NoequOp,MoreOp,MoreequOp  比较的结果保留在$t8寄存器之中
@@ -296,8 +393,14 @@ void sentences(){
         sprintf(resultMips[ansCount++],"%s $t8 %s %s",comops[codes[nowCode].op-13],arg1reg,arg2reg);
     } else if(codes[nowCode].op == GotoOp) {
         sprintf(resultMips[ansCount++],"j %s",codes[nowCode].result);
+        ////////////////////////////
+        writeOutSreg(); //最后一条语句为goto可能是循环，需要写回
+        /////////////////////////////
     } else if(codes[nowCode].op == FalseOp || codes[nowCode].op == TrueOp){
         sprintf(resultMips[ansCount++],"beq $t8 %d %s",codes[nowCode].op == TrueOp,codes[nowCode].result);
+        /////////////////////////////
+        writeOutSreg(); //写回寄存器
+        ////////////////////////////
     } else if(codes[nowCode].op == CallOp){
         //检索函数参数内容//
         int index = 0;

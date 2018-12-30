@@ -2,17 +2,21 @@
 #include "parse.h"
 #include "symbol.h"
 #include "util.h"
-#include "midTomips.h"
 #include "optimization.h"
+#include "midTomips.h"
 
 void testParse(){
     setup();
     program();
     //printtabs();
     printcodes();
+    /////////////////////
     basicBlock();
     printcodesOfBasic();
+    loopOptimize(); //优化部分，之后进行相应的整合
+    /////////////////////
     //printstring();
+    printcodes();
     midToMips();
     //printmips();
     printToFILE();

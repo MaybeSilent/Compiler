@@ -4,7 +4,7 @@
 	"parse.h"
 	"optimization.h"
 
-1546134251 source:e:\workfile\develop\compiler\compiler\parse.c
+1546144163 source:e:\workfile\develop\compiler\compiler\parse.c
 	"symbol.h"
 	"types.h"
 	"parse.h"
@@ -13,7 +13,7 @@
 
 1543045108 e:\workfile\develop\compiler\compiler\parse.h
 
-1545988795 e:\workfile\develop\compiler\compiler\types.h
+1546174578 e:\workfile\develop\compiler\compiler\types.h
 	<string.h>
 	<stdio.h>
 	<stdlib.h>
@@ -41,30 +41,31 @@
 	"types.h"
 	"symbol.h"
 
-1546137018 source:e:\workfile\develop\compiler\compiler\test.c
+1546177360 source:e:\workfile\develop\compiler\compiler\test.c
 	"types.h"
 	"parse.h"
 	"symbol.h"
 	"util.h"
-	"midTomips.h"
 	"optimization.h"
+	"midTomips.h"
 
 1542442852 e:\workfile\develop\compiler\compiler\test.h
 
 1545998736 e:\workfile\develop\compiler\compiler\util.h
 
-1546138898 source:e:\workfile\develop\compiler\compiler\util.c
+1546176812 source:e:\workfile\develop\compiler\compiler\util.c
 	"types.h"
 	"error.h"
 	"util.h"
 	"optimization.h"
 
-1546134585 source:e:\workfile\develop\compiler\compiler\midtomips.c
+1546168291 source:e:\workfile\develop\compiler\compiler\midtomips.c
 	"types.h"
 	"util.h"
 	"optimization.h"
+	"midTomips.h"
 
-1542894095 e:\workfile\develop\compiler\compiler\midtomips.h
+1546157451 e:\workfile\develop\compiler\compiler\midtomips.h
 
 1543323590 source:e:\workfile\develop\compiler\compiler\preprocess.c
 	"preprocess.h"
@@ -73,11 +74,11 @@
 
 1543323617 e:\workfile\develop\compiler\compiler\preprocess.h
 
-1546138473 source:e:\workfile\develop\compiler\compiler\optimization.c
+1546177255 source:e:\workfile\develop\compiler\compiler\optimization.c
 	"types.h"
 	"optimization.h"
 
-1546137801 e:\workfile\develop\compiler\compiler\optimization.h
+1546177518 e:\workfile\develop\compiler\compiler\optimization.h
 
 1546075712 source:e:\workfile\develop\compiler\compiler\opgenerate.c
 

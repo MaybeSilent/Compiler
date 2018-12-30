@@ -540,6 +540,7 @@ void judgestate(){
     strcpy(judgereg,retexpre);
 
     //if中需要从左到右进行计算，对于全局变量需要开相应的寄存器进行存储
+    //不合理的设计
     if(IfFlag == 0){
         int j = level;
         int i = blocktabs[display[j]].last;

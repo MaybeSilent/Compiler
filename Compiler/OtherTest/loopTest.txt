@@ -1,0 +1,15 @@
+void testLoop(){
+    int i;
+    i = 10;
+    do{
+	printf(i);
+	i = i - 1;
+    } while(i)
+}
+
+void main(){
+    int i;
+    for(i = 10 ; i ; i = i - 1){
+	testLoop();
+    }
+}

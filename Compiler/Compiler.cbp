@@ -44,6 +44,7 @@
 		<Unit filename="midTomips.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="midTomips.h" />
 		<Unit filename="optimization.c">
 			<Option compilerVar="CC" />
 		</Unit>
