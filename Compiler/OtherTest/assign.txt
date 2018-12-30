@@ -1,0 +1,13 @@
+void test(){
+    printf("test");
+}
+void main(){
+    int a; 
+    int b;
+    if(0){
+        a = 0;
+        b = 1;
+    }
+    b = 2;
+    test();
+}

@@ -1,5 +1,7 @@
 #include "types.h"
 #include "util.h"
+#include "optimization.h"
+
 int nowCode;
 
 char globalVariable[4096][128];
@@ -38,7 +40,7 @@ struct regState{
     int states; //0代表空闲
     char name[128]; //所存放的值名字
 };
-String regName[8] = {"$t0","$t1","$t2","$t3","$t4","$t5","$t6","$t7"};
+String regName[] = {"$t0","$t1","$t2","$t3","$t4","$t5","$t6","$t7"};
 struct regState Regpool[8];
 
 int rollIndex = 0;
@@ -305,7 +307,7 @@ void sentences(){
         int count = funcnum[index];
         int offset = 0;
         offset = ( count * (-4)) - parmcount;
-        saveall();
+        if(!OPTIMIZE) saveall();
         /////////////////////////////////
         sprintf(resultMips[ansCount++],"sw $fp %d($sp)",parmcount);
         sprintf(resultMips[ansCount++],"sw $ra %d($sp)",parmcount - 4);

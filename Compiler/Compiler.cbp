@@ -44,14 +44,14 @@
 		<Unit filename="midTomips.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="optimization.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="optimization.h" />
 		<Unit filename="parse.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="parse.h" />
-		<Unit filename="preprocess.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="preprocess.h" />
 		<Unit filename="symbol.c">
 			<Option compilerVar="CC" />
 		</Unit>

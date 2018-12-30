@@ -1,6 +1,7 @@
 #include "types.h"
 #include "error.h"
 #include "util.h"
+#include "optimization.h"
 
 char numstring[32];
 char charstring[32];
@@ -157,6 +158,33 @@ void printcodes(){
     }
 }
 
+void printcodesOfBasic(){
+    printf("<<<<<<<<<<<<<basiblock>>>>>>>>>>>>>>>>\n");
+    String opstring[] = {"const","var","array","function","param","push","call","getArray","*","/","+","-",
+                        "=","<","<=","==","!=",">",">=",
+                        "falsegoto","truegoto","goto","label","scanf","printf","ret","main"};
+    printf("%15s %15s %15s %15s\n","opeartion","arg1","arg2","result");
+    int i = 0;
+    for(i = 0 ; i < bbCount ; i++){
+        int j = 0;
+        //printf("%d %d %d>>>>>",i,opblock[i].start,opblock[i].finish);
+        for(j = opblock[i].start ; j <= opblock[i].finish ; j++){
+            printf("%15s %15s %15s %15s\n",opstring[codes[j].op],codes[j].arg1,codes[j].arg2,codes[j].result);
+        }
+        printf("opblock: %d %d %d ",i,opblock[i].start,opblock[i].finish);
+        printf("next: ");
+        for(j = 0 ; j < opblock[i].nextCount ; j++){
+            printf("%d ",opblock[i].next[j]);
+        }
+        printf("\n");
+    }
+
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<<loops>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    for(i = 0 ; i < loopCount ; i++){
+        printf("Loop: %d %d \n",loopBlo[i].start,loopBlo[i].ends);
+    }
+}
+
 void printstring(){
     printf("<<<<<<<<<<<strings>>>>>>>>>>>>\n");
     int i = 0 ;
@@ -181,7 +209,7 @@ void printmips(){
 void printToFILE(){
     int er = getErrorNum();
     if(er == 0){
-        printf("结果位于result.asm中!");
+        printf("结果位于result.asm中!\n");
         FILE *f = fopen("result.asm","w");
         int i = 0 ;
         for(i = 0 ; i < dataCount ; i++){
@@ -193,6 +221,6 @@ void printToFILE(){
             i++;
         }
     } else {
-        printf("请先改正错误再进行编译！");
+        printf("请先改正错误再进行编译！\n");
     }
 }

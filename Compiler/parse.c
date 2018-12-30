@@ -534,13 +534,13 @@ void genBackLabel(int codepos){
 void judgestate(){
 
     if(grammer) printf("处理到条件语句\n");
-
+    int IfFlag = strcmp(id,"if");
     insymbol();
     expression();
     strcpy(judgereg,retexpre);
 
     //if中需要从左到右进行计算，对于全局变量需要开相应的寄存器进行存储
-    if(strcmp(id,"if") != 0){
+    if(IfFlag == 0){
         int j = level;
         int i = blocktabs[display[j]].last;
         while(i != 0){

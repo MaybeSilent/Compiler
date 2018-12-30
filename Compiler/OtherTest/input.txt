@@ -1,0 +1,103 @@
+const int const_a = 10;
+const char const_b = 'b';
+const int const_less = -20 , const_more = +25;
+
+int var_a,var_b;
+int var_input_Mult;
+char var_c,var_d;
+char chars10;
+char var_string[100];
+
+void compareTwo(){
+    if(var_a < var_b) printf("var_a < var_b");
+    if(var_a <= var_b) printf("var_a <= var_b");
+    if(var_a > var_b) printf("var_a > var_b");
+    if(var_a >= var_b) printf("var_a >= var_b");
+    if(var_a != var_b) printf("var_a != var_b");
+    if(var_a == var_b) printf("var_a == var_b");
+}
+
+void testIf(){
+    if(var_a) printf("var_a");
+    else printf("not var_a");
+}
+
+int getMult(int number){
+    if(number == 1) return (1);
+    return (number*getMult(number - 1));
+}
+
+void test_do_while(){
+    int var_count;
+    int var_input;
+
+    var_count = 0;
+    do{
+        var_count = var_count + 1;
+        printf(var_count);
+    } while(var_count < 10);;;;;;
+}
+
+void test_expression(int param_one , int param_two){
+    printf(-param_one*param_two);
+    printf(+param_one*param_two);
+    printf(+param_one/param_two);
+    printf(param_one*param_one + param_two*param_two);
+    printf(param_one*2 + 100);
+    printf(param_one + 'a');
+    printf(param_two + 'b');
+}
+
+void test_for(){
+    int var_start,var_end;
+    int var_value;
+    var_start = 1;
+    var_end = 10;
+    for(var_value = var_start; var_value > var_end ; var_value = var_value - 2){
+        printf(var_value);
+    }
+    for(var_value = var_start; var_value < var_end ; var_value = var_value + 1){
+        printf(var_value);
+    }
+    for(var_value = var_start; var_value < var_end ; var_value = var_value + 2){
+        printf(var_value);
+    }
+}
+
+int feb(int n){
+    if(n == 0) return (0);
+    if(n == 1) return (1);
+    if(n >= 2) return (feb(n-1) + feb(n-2));
+}
+
+void main(){
+    int var_input_Mult;
+    int param_one,param_two;
+    
+    var_a = 1;
+    var_b = 0;
+    compareTwo();
+    var_a = 0;
+    var_b = 1;
+    compareTwo();
+    var_a = 1;
+    var_b = 1;
+    compareTwo();
+   
+    var_a = getMult(3);
+    printf(var_a);
+
+    var_a = 1;
+    testIf();
+    var_a = 0;
+    testIf();
+    
+    var_a = 3;
+    var_b = 3;
+    test_expression( var_a , var_b);
+
+    test_do_while();
+    test_for();
+    var_a = feb(10);
+    printf(var_a);
+}

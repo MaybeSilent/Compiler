@@ -23,6 +23,9 @@ int insertString(String instring);
 void printmips();
 void program();
 
+void printcodes();
+void printcodesOfBasic();
+
 String findbyReg(String in,int flag);
 void printToFILE();
 #endif // UTIL_H_INCLUDED

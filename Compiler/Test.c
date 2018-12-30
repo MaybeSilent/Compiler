@@ -3,15 +3,18 @@
 #include "symbol.h"
 #include "util.h"
 #include "midTomips.h"
+#include "optimization.h"
 
 void testParse(){
     setup();
     program();
-    printtabs();
+    //printtabs();
     printcodes();
+    basicBlock();
+    printcodesOfBasic();
     //printstring();
     midToMips();
-    printmips();
+    //printmips();
     printToFILE();
 }
 
