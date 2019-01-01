@@ -162,7 +162,7 @@ void printcodesOfBasic(){
     printf("<<<<<<<<<<<<<basiblock>>>>>>>>>>>>>>>>\n");
     String opstring[] = {"const","var","array","function","param","push","call","getArray","*","/","+","-",
                         "=","<","<=","==","!=",">",">=",
-                        "falsegoto","truegoto","goto","label","scanf","printf","ret","main"};
+                        "falsegoto","truegoto","goto","label","scanf","printf","ret","NULL"};
     printf("%15s %15s %15s %15s\n","opeartion","arg1","arg2","result");
     int i = 0;
     for(i = 0 ; i < bbCount ; i++){
@@ -208,19 +208,37 @@ void printmips(){
 
 void printToFILE(){
     int er = getErrorNum();
-    if(er == 0){
-        printf("结果位于result.asm中!\n");
-        FILE *f = fopen("result.asm","w");
-        int i = 0 ;
-        for(i = 0 ; i < dataCount ; i++){
-            fprintf(f,"%s\n",dataVariable[i]);
-        }
-        i = 0;
-        while(i != ansCount){
-            fprintf(f,"%s\n",resultMips[i]);
-            i++;
+    if(!OPTIMIZE){
+        if(er == 0){
+            printf("结果位于result.asm中!\n");
+            FILE *f = fopen("result.asm","w");
+            int i = 0 ;
+            for(i = 0 ; i < dataCount ; i++){
+                fprintf(f,"%s\n",dataVariable[i]);
+            }
+            i = 0;
+            while(i != ansCount){
+                fprintf(f,"%s\n",resultMips[i]);
+                i++;
+            }
+        } else {
+            printf("请先改正错误再进行编译！\n");
         }
     } else {
-        printf("请先改正错误再进行编译！\n");
+        if(er == 0){
+            printf("优化后的结果位于result.asm中!\n");
+            FILE *f = fopen("resultOp.asm","w");
+            int i = 0 ;
+            for(i = 0 ; i < dataCount ; i++){
+                fprintf(f,"%s\n",dataVariable[i]);
+            }
+            i = 0;
+            while(i != ansCount){
+                fprintf(f,"%s\n",resultMips[i]);
+                i++;
+            }
+            //printf("%d %d >>>>>>>>>>>\n",dataCount , ansCount);
+        }
     }
+
 }

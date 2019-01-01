@@ -142,7 +142,6 @@ lw $t8 -0($fp)
 li $t9 1
 subu $t0 $t8 $t9
 sw $t0 0($sp)
-sw $t0 -12($fp)
 sw $fp -4($sp)
 sw $ra -8($sp)
 move $fp $sp
@@ -150,33 +149,33 @@ jal getMult
 move $sp $fp
 lw $fp -4($sp)
 lw $ra -8($sp)
-move $t0 $v0
+move $t1 $v0
+sw $t1 -16($fp)
 lw $t8 -0($fp)
-mult $t8 $t0
-mflo $t1
-move $v0 $t1
+lw $t1 -16($fp)
+mult $t8 $t1
+mflo $t2
+move $v0 $t2
 jr $ra
 test_do_while:
-subiu $sp $sp 20
+subiu $sp $sp 16
 #~~~变量声明部分结束~~~~
 li $t9 0
 sw $t9 -8($fp)
+lw $s0 -8($fp)
 label_9:
-lw $t8 -8($fp)
 li $t9 1
-addu $t0 $t8 $t9
-sw $t0 -8($fp)
-lw $t8 -8($fp)
-move $a0 $t8
+addu $s0 $s0 $t9
+move $a0 $s0
 li $v0 1
 syscall
 li $a0 '\n'
 li $v0 11
 syscall
-lw $t8 -8($fp)
 li $t9 10
-slt $t8 $t8 $t9
+slt $t8 $s0 $t9
 beq $t8 1 label_9
+sw $s0 -8($fp)
 jr $ra
 test_expression:
 subiu $sp $sp 60
@@ -234,9 +233,9 @@ li $t9 2
 mult $t8 $t9
 mflo $t7
 li $t9 100
-sw $t0 -16($fp)
-addu $t0 $t7 $t9
-move $a0 $t0
+sw $t3 -28($fp)
+addu $t3 $t7 $t9
+move $a0 $t3
 li $v0 1
 syscall
 li $a0 '\n'
@@ -244,9 +243,9 @@ li $v0 11
 syscall
 lw $t8 -0($fp)
 li $t9 97
-sw $t1 -20($fp)
-addu $t1 $t8 $t9
-move $a0 $t1
+sw $t4 -32($fp)
+addu $t4 $t8 $t9
+move $a0 $t4
 li $v0 1
 syscall
 li $a0 '\n'
@@ -254,9 +253,9 @@ li $v0 11
 syscall
 lw $t8 -4($fp)
 li $t9 98
-sw $t2 -24($fp)
-addu $t2 $t8 $t9
-move $a0 $t2
+sw $t5 -36($fp)
+addu $t5 $t8 $t9
+move $a0 $t5
 li $v0 1
 syscall
 li $a0 '\n'
@@ -264,7 +263,7 @@ li $v0 11
 syscall
 jr $ra
 test_for:
-subiu $sp $sp 32
+subiu $sp $sp 20
 #~~~变量声明部分结束~~~~
 li $t9 1
 sw $t9 -8($fp)
@@ -272,64 +271,61 @@ li $t9 10
 sw $t9 -12($fp)
 lw $t9 -8($fp)
 sw $t9 -16($fp)
+lw $s0 -16($fp)
+lw $s1 -12($fp)
 label_10:
-lw $t8 -16($fp)
-lw $t9 -12($fp)
-sgt $t8 $t8 $t9
+sgt $t8 $s0 $s1
 beq $t8 0 label_11
-lw $t8 -16($fp)
-move $a0 $t8
+move $a0 $s0
 li $v0 1
 syscall
 li $a0 '\n'
 li $v0 11
 syscall
-lw $t8 -16($fp)
 li $t9 2
-subu $t0 $t8 $t9
-sw $t0 -16($fp)
+subu $s0 $s0 $t9
 j label_10
 label_11:
+sw $s0 -16($fp)
+sw $s1 -12($fp)
 lw $t9 -8($fp)
 sw $t9 -16($fp)
+lw $s0 -16($fp)
+lw $s1 -12($fp)
 label_12:
-lw $t8 -16($fp)
-lw $t9 -12($fp)
-slt $t8 $t8 $t9
+slt $t8 $s0 $s1
 beq $t8 0 label_13
-lw $t8 -16($fp)
-move $a0 $t8
+move $a0 $s0
 li $v0 1
 syscall
 li $a0 '\n'
 li $v0 11
 syscall
-lw $t8 -16($fp)
 li $t9 1
-addu $t1 $t8 $t9
-sw $t1 -16($fp)
+addu $s0 $s0 $t9
 j label_12
 label_13:
+sw $s0 -16($fp)
+sw $s1 -12($fp)
 lw $t9 -8($fp)
 sw $t9 -16($fp)
+lw $s0 -16($fp)
+lw $s1 -12($fp)
 label_14:
-lw $t8 -16($fp)
-lw $t9 -12($fp)
-slt $t8 $t8 $t9
+slt $t8 $s0 $s1
 beq $t8 0 label_15
-lw $t8 -16($fp)
-move $a0 $t8
+move $a0 $s0
 li $v0 1
 syscall
 li $a0 '\n'
 li $v0 11
 syscall
-lw $t8 -16($fp)
 li $t9 2
-addu $t2 $t8 $t9
-sw $t2 -16($fp)
+addu $s0 $s0 $t9
 j label_14
 label_15:
+sw $s0 -16($fp)
+sw $s1 -12($fp)
 jr $ra
 feb:
 subiu $sp $sp 32
@@ -358,7 +354,6 @@ lw $t8 -0($fp)
 li $t9 1
 subu $t0 $t8 $t9
 sw $t0 0($sp)
-sw $t0 -12($fp)
 sw $fp -4($sp)
 sw $ra -8($sp)
 move $fp $sp
@@ -366,13 +361,12 @@ jal feb
 move $sp $fp
 lw $fp -4($sp)
 lw $ra -8($sp)
-move $t0 $v0
+move $t1 $v0
+sw $t1 -16($fp)
 lw $t8 -0($fp)
 li $t9 2
 subu $t1 $t8 $t9
 sw $t1 0($sp)
-sw $t0 -16($fp)
-sw $t1 -20($fp)
 sw $fp -4($sp)
 sw $ra -8($sp)
 move $fp $sp
@@ -380,10 +374,12 @@ jal feb
 move $sp $fp
 lw $fp -4($sp)
 lw $ra -8($sp)
-move $t0 $v0
-lw $t1 -16($fp)
-addu $t2 $t1 $t0
-move $v0 $t2
+move $t2 $v0
+sw $t2 -24($fp)
+lw $t2 -16($fp)
+lw $t3 -24($fp)
+addu $t4 $t2 $t3
+move $v0 $t4
 jr $ra
 label_18:
 jr $ra
@@ -433,6 +429,8 @@ move $sp $fp
 lw $fp -4($sp)
 lw $ra -8($sp)
 move $t0 $v0
+sw $t0 -20($fp)
+lw $t0 -20($fp)
 sw $t0 -16($gp)
 lw $t8 -16($gp)
 move $a0 $t8
@@ -443,7 +441,6 @@ li $v0 11
 syscall
 li $t9 1
 sw $t9 -16($gp)
-sw $t0 -20($fp)
 sw $fp 0($sp)
 sw $ra -4($sp)
 move $fp $sp
@@ -498,8 +495,10 @@ jal feb
 move $sp $fp
 lw $fp -4($sp)
 lw $ra -8($sp)
-move $t0 $v0
-sw $t0 -16($gp)
+move $t1 $v0
+sw $t1 -24($fp)
+lw $t1 -24($fp)
+sw $t1 -16($gp)
 lw $t8 -16($gp)
 move $a0 $t8
 li $v0 1

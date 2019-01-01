@@ -1,0 +1,28 @@
+void main(){
+    int n;
+    int data[233];
+    int i;
+    int x;
+
+    printf("Well, let's run another segment tree test to verify its correctness.");
+    printf("Please input the length of the sequence:");
+    scanf(n);
+    
+    i = 1;
+    do{
+        printf("Please input the ", i);
+        printf("-th number: ");
+        scanf(x);
+        data[i]=x;
+        i = i + 1;
+    }while(i<=n)
+    
+    printf("The numbers you just inputed are:");
+    i = 1;
+    do{
+        printf("The ", i);
+        printf("-th: ",data[i]);
+        i = i+  1;
+    }while(i<=n)
+
+}

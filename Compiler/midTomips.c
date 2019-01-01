@@ -3,7 +3,6 @@
 #include "optimization.h"
 #include "midTomips.h"
 
-int nowCode;
 
 char globalVariable[4096][128];
 int globalpos[4096];
@@ -17,10 +16,24 @@ int funcnum[256];
 int funcCount = 0;
 
 int parmcount = 0;
+int nowCode = 0;
 
 int loopNow = 0;
 int addNextLabel = 0;
 int IsInLoop = 0;
+
+void reset(){
+    funcCount = 0;
+    parmcount = 0;
+    loopNow = 0;
+    addNextLabel = 0;
+    IsInLoop = 0;
+    dataCount = 0;
+    ansCount = 0;
+    nowCode = 0;
+    localCount = 0;
+    globalCount = 0;
+}
 
 void printVariable(){
     int i = 0;
@@ -426,12 +439,22 @@ void sentences(){
         if(offset != 0){
             parmcount = parmcount + count * 4;
         } else parmcount = 0;
-        if(strcmp(codes[nowCode].result,"0") != 0) sprintf(resultMips[ansCount++],"move %s $v0",findbyReg(codes[nowCode].result,0));
+        if(strcmp(codes[nowCode].result,"0") != 0){
+            String resultReg = findbyReg(codes[nowCode].result,0);
+            sprintf(resultMips[ansCount++],"move %s $v0",resultReg);
+            if(OPTIMIZE) saveToMem(resultReg[2] - '0');
+        }
     } else if(codes[nowCode].op == ScanfOp){
         int scanftype = strcmp(codes[nowCode].arg1,"int") == 0 ? 5 : 12 ;
         sprintf(resultMips[ansCount++],"li $v0 %d",scanftype);
         sprintf(resultMips[ansCount++],"syscall");
-        sprintf(resultMips[ansCount++],"sw $v0 %s",find(codes[nowCode].result,"0"));
+        //////////
+        if(OPTIMIZE && IsInLoop && IsInS(codes[nowCode].result) != -1){
+            sprintf(resultMips[ansCount++],"move %s $v0",findbyReg(codes[nowCode].result,0));
+        } else {
+            sprintf(resultMips[ansCount++],"sw $v0 %s",find(codes[nowCode].result,"0"));
+        }
+
     } else if(codes[nowCode].op == PrintfOp){
         int printftype = strcmp(codes[nowCode].arg1,"int") == 0 ? 1 : strcmp(codes[nowCode].arg1,"char") == 0 ? 11 : 4;
         if(printftype == 4) {

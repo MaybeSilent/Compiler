@@ -66,7 +66,7 @@ void opexpre(){
                     } //不能够是数组
                     if(strcmp(codes[j].result,codes[j+1].arg1) == 0 && strcmp(codes[j+1].arg2,"0") == 0 && AddFlag){
                         strcpy(codes[j].result , codes[j+1].result);
-                        printf("%d %d >>>>>>>>>>>>>>>>>>>>>>>>>>\n",j , j +1);
+                        //printf("%d %d >>>>>>>>>>>>>>>>>>>>>>>>>>\n",j , j +1);
                         codes[j+1].op = NullOp;
                     }
                 }
@@ -112,7 +112,7 @@ void basicBlock(){
         }
         if(codes[opblock[i].finish + 1].op != FunctionOp && i + 1 < InCount) opblock[i].next[opblock[i].nextCount++] = i + 1;
     }
-    loopCallLoop();
+    //loopCallLoop();
 }
 //循环中全局寄存器的分配
 //对于循环中的全局寄存器进行分配
@@ -135,7 +135,7 @@ void addVar(String var){
     numsOfCounter ++;
 }
 int cmp (const void *a , const void *b){
-    return ((struct countOfVar *)b)->nums - ((struct countOfVar *)a) -> nums ;
+    return ((struct countOfVar *)b) -> nums - ((struct countOfVar *)a) -> nums ;
 }
 void sortCounters(){
     qsort(counters,numsOfCounter,sizeof(struct countOfVar),cmp);
@@ -153,6 +153,10 @@ void loopOptimize(){
                 if(codes[j].op == BecomeOp && strcmp(codes[j].arg2,"0") != 0) continue;
                 if(codes[j].op == GetArrayOp){
                     if(isVar(codes[j].arg2)) addVar(codes[j].arg2);
+                    continue;
+                }
+                if(codes[j].op == ScanfOp){
+                    if(isVar(codes[j].result)) addVar(codes[j].result);
                     continue;
                 }
                 if(isVar(codes[j].arg1)) addVar(codes[j].arg1);
@@ -173,9 +177,63 @@ void loopOptimize(){
     }
 
     opexpre();
+
+    //findexpres();
+
 }
 
 
 //DAG图的优化
+void findexpres(){
+    int i ;
+    for( i = 0 ; i < loopCount ; i++){
+        int start = loopBlo[i].start;
+        int end = loopBlo[i].ends;
+        int j ;
+        for(j = start ; j <= end ; j++){
+            int startInBlo = opblock[j].start;
+            int endInBlo = opblock[j].finish;
+            int equalNum = 0;
+            int inExpre = 0;
+
+            int k = 0;
+            int exprestart;
+            //printf(" %d %d \n", startInBlo , endInBlo);
+            for( k = startInBlo ; k < endInBlo ; k++){
+                if(codes[k].op == AddOp || codes[k].op == SubOp || codes[k].op == MultOp || codes[k].op == DivOp){
+                    if(inExpre == 0) {
+                        inExpre = 1 ;
+                        exprestart = k;
+                    }
+                } else if(codes[k].op == BecomeOp || codes[k].op == NullOp){
+                    equalNum ++;
+                } else if(inExpre == 1){
+                    if(equalNum > 1){
+                        expres[expreNum].start = exprestart;
+                        expres[expreNum++].ends = k - 1;
+                    }
+                    inExpre = 0 ;
+                    equalNum = 0 ;
+                }
+            }
+        }
+    }
+    /*
+    for( i = 0 ; i < expreNum ; i++){
+        printf(" %d %d \n", expres[i].start , expres[i].ends);
+    }
+    */
+}
+
+void getdag(){
+    int i;
+    for( i = 0 ; i < expreNum ; i++ ){
+        int j ;
+        for( j = expres[i].start ; j < expres[i].ends ; j++){
+
+        }
+    }
+}
+
 
 

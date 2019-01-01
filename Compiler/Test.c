@@ -4,23 +4,37 @@
 #include "util.h"
 #include "optimization.h"
 #include "midTomips.h"
+#include "midTomips.h"
 
 void testParse(){
     setup();
+    OPTIMIZE = 0;
     program();
-    //printtabs();
-    printcodes();
-    /////////////////////
-    basicBlock();
-    printcodesOfBasic();
-    loopOptimize(); //优化部分，之后进行相应的整合
-    /////////////////////
-    //printstring();
-    printcodes();
     midToMips();
-    //printmips();
+    printToFILE();
+
+    OPTIMIZE = 1;
+    reset();
+    basicBlock();
+    loopOptimize();
+
+    //printf("%d >>>>>>>>>>>>>>>>\n",loopCount);
+    //printcodesOfBasic();
+
+    midToMips();
     printToFILE();
 }
+    //printtabs();
+    //printcodes();
+    /////////////////////
+    //basicBlock();
+    //loopOptimize(); //优化部分，之后进行相应的整合
+    //printcodesOfBasic();
+    /////////////////////
+    //printstring();
+    //printcodes();
+    //printmips();
+
 
 void testSymbol(){
     String symbolString[] = {
