@@ -327,7 +327,13 @@ void factor(){
             return ;
         }
         if(idtabs[pos].kind == Var || idtabs[pos].kind == Const || idtabs[pos].kind == Parm){
-            strcpy(retfactor,id);
+            if(idtabs[pos].kind == Var && isGlobal(id)){
+                emit(AddOp,idtabs[pos].name,"0",numToReg(tempregNum));
+                strcpy(retfactor,numToReg(tempregNum++));
+            } else {
+                strcpy(retfactor,id);
+            }
+
             if(idtabs[pos].kind == Const){
                 constsign = 1;
                 factorValue = idtabs[pos].value;
@@ -534,30 +540,12 @@ void genBackLabel(int codepos){
 void judgestate(){
 
     if(grammer) printf("处理到条件语句\n");
-    int IfFlag = strcmp(id,"if");
     insymbol();
     expression();
     strcpy(judgereg,retexpre);
 
-    //if中需要从左到右进行计算，对于全局变量需要开相应的寄存器进行存储
+    //表达式需要从左到右进行计算，对于全局变量需要开相应的寄存器进行存储
     //不合理的设计
-    if(IfFlag == 0){
-        int j = level;
-        int i = blocktabs[display[j]].last;
-        while(i != 0){
-            if(strcmp(idtabs[i].name , id) == 0) break;
-            i = idtabs[i].link;
-        }
-        if( i == 0 ){
-            int pos = loc(id);
-            if(pos == -1) error(38);
-            if(idtabs[pos].kind == Var){
-                emit(AddOp,idtabs[pos].name,"0",numToReg(tempregNum));
-                strcpy(judgereg,numToReg(tempregNum++));
-            }
-        }
-    }
-    //if全局计算bug更正
 
     if(expreType == Char) error(25);//条件赋值语句类型不匹配判断
 

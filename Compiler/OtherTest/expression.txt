@@ -1,6 +1,0 @@
-void main(){
-    int a,b;
-    a = 1+2;
-    b = a+3;
-    a = b;
-}

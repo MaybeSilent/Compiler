@@ -70,7 +70,7 @@ void writeInSreg(){
     if(OPTIMIZE){
         //printf("loopNow: %d loopCount: %d nowCode: %d  opblock[loopBlo[loopNow].start].start: %d\n",loopNow,loopCount,nowCode,opblock[loopBlo[loopNow].start].start);
         if(loopNow < loopCount && nowCode == opblock[loopBlo[loopNow].start].start){
-            printf("开始优化循环部分.....\n");
+            //printf("开始优化循环部分.....\n");
             int j = 0;
             for(j = 0 ; j < loopBlo[loopNow].regNum ; j++){
                 sprintf(resultMips[ansCount++],"lw $s%d %s",j,find(loopBlo[loopNow].regs[j],"0"));
@@ -134,12 +134,12 @@ String find(String name,String pos){
                 break;
             }
         }
-        if(globalFlag == -1){
-            printf("%s\n",name);
+        //if(globalFlag == -1){
+            //printf("%d %s\n",nowCode,name);
             //printVariable();
-            printf("%s %s %s\n",codes[nowCode].arg1,codes[nowCode].arg2,codes[nowCode].result);
-            printf("server error happen\n");
-        }
+            //printf("%s %s %s\n",codes[nowCode].arg1,codes[nowCode].arg2,codes[nowCode].result);
+            //printf("server error happen\n");
+        //}
     }
     if(pos[0] >= '0' && pos[0] <= '9'){
         int index = atoi(pos);
@@ -424,6 +424,7 @@ void sentences(){
         int offset = 0;
         offset = ( count * (-4)) - parmcount;
         if(!OPTIMIZE) saveall();
+        //saveall();
         /////////////////////////////////
         sprintf(resultMips[ansCount++],"sw $fp %d($sp)",parmcount);
         sprintf(resultMips[ansCount++],"sw $ra %d($sp)",parmcount - 4);

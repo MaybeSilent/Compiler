@@ -28,4 +28,6 @@ void printcodesOfBasic();
 
 String findbyReg(String in,int flag);
 void printToFILE();
+int isGlobal(String id);
+void printMidToFile();
 #endif // UTIL_H_INCLUDED

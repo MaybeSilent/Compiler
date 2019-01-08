@@ -10,6 +10,7 @@ void testParse(){
     setup();
     OPTIMIZE = 0;
     program();
+    printMidToFile();
     midToMips();
     printToFILE();
 
@@ -20,7 +21,7 @@ void testParse(){
 
     //printf("%d >>>>>>>>>>>>>>>>\n",loopCount);
     //printcodesOfBasic();
-
+    printMidToFile();
     midToMips();
     printToFILE();
 }

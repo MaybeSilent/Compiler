@@ -81,6 +81,18 @@ int loc(String id){
     return -1;
 }
 
+int isGlobal(String id){
+    int j = level;
+    int i = blocktabs[display[j]].last;
+    while(i != 0){
+        if(strcmp(idtabs[i].name , id) == 0) break;
+        i = idtabs[i].link;
+    }
+    if(i == 0) return 1;
+    else return 0;
+
+}
+
 void entertab(String name, enum kindsy kind, enum typel type, int value){
     int blockindex = display[level];
     //检查前面是否已有相应命名冲突 error(4)
@@ -204,6 +216,36 @@ void printmips(){
         printf("%s\n",resultMips[i]);
         i++;
     }
+}
+
+void printMidToFile(){
+    String opstring[] = {"const","var","array","function","param","push","call","getArray","*","/","+","-",
+                    "=","<","<=","==","!=",">",">=",
+                    "falsegoto","truegoto","goto","label","scanf","printf","ret","NULL"};
+    int er = getErrorNum();
+    if(!OPTIMIZE){
+        if(er == 0){
+            printf("中间代码结果位于midcode.txt中!\n");
+            FILE *f = fopen("midcode.txt","w");
+            int i = 0 ;
+            for(i = 0 ; i < codeCount ; i++){
+                fprintf(f,"%15s %15s %15s %15s\n",opstring[codes[i].op],codes[i].arg1,codes[i].arg2,codes[i].result);
+                //fprintf(f,"%s\n",dataVariable[i]);
+            }
+        } else {
+            printf("请先改正错误再进行编译！\n");
+        }
+    } else {
+        if(er == 0){
+            printf("优化后的中间结果位于midcodeOp.txt中!\n");
+            FILE *f = fopen("midcodeOp.txt","w");
+            int i = 0 ;
+            for(i = 0 ; i < codeCount ; i++){
+                fprintf(f,"%15s %15s %15s %15s\n",opstring[codes[i].op],codes[i].arg1,codes[i].arg2,codes[i].result);
+            }
+        }
+    }
+
 }
 
 void printToFILE(){
